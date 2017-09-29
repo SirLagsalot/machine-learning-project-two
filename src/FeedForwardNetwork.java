@@ -53,5 +53,13 @@ public class FeedForwardNetwork extends NeuralNetwork {
 
             this.hiddenLayers.add(hiddenNeuronLayer);
         }
+
+        // Output Layer
+        this.ouputLayer = new ArrayList<>();
+        for (int i = 0; i < this.outputs; i++) {
+            for (int j = 0; j < this.outputs; j++) {
+                this.ouputLayer.add(new Neuron(this.activationFunction, this.outputs));
+            }
+        }
     }
 }
