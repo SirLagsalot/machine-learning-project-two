@@ -13,4 +13,9 @@ public class RadialBasisNetwork extends NeuralNetwork {
     public void train() {
 
     }
+
+    @Override
+    public double approximate() {
+        return 0;
+    }
 }

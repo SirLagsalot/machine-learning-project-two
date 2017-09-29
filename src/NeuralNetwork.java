@@ -9,4 +9,6 @@ public abstract class NeuralNetwork implements IFunctionApproximator {
     }
 
     public abstract void train();
+
+    public abstract double approximate();
 }

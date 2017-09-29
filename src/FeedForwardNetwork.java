@@ -28,6 +28,11 @@ public class FeedForwardNetwork extends NeuralNetwork {
 
     }
 
+    @Override
+    public double approximate() {
+        return 0;
+    }
+
     private void initializeNeurons() {
         // Input Layer
         this.inputLayer = new ArrayList<>();
