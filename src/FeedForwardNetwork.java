@@ -10,7 +10,7 @@ public class FeedForwardNetwork extends NeuralNetwork {
 
     private ArrayList<Neuron> inputLayer;
     private ArrayList<ArrayList<Neuron>> hiddenLayers;
-    private ArrayList<Neuron> ouputLayer;
+    private ArrayList<Neuron> outputLayer;
 
     public FeedForwardNetwork(int inputs, int outputs, int numHiddenLayers, int numNeuronsPerHiddenLayer,
                               boolean momentum, IActivationFunction activationFunction) {
@@ -60,10 +60,10 @@ public class FeedForwardNetwork extends NeuralNetwork {
         }
 
         // Output Layer
-        this.ouputLayer = new ArrayList<>();
+        this.outputLayer = new ArrayList<>();
         for (int i = 0; i < this.outputs; i++) {
             for (int j = 0; j < this.outputs; j++) {
-                this.ouputLayer.add(new Neuron(this.activationFunction, this.outputs));
+                this.outputLayer.add(new Neuron(this.activationFunction, this.outputs));
             }
         }
     }
