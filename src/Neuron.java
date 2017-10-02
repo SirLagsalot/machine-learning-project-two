@@ -2,11 +2,14 @@ import java.util.Random;
 
 public class Neuron implements INeuron {
 
+    private int numConnections;
     private double[] weights;
     private IActivationFunction activationFunction;
 
     public Neuron(IActivationFunction activationFunction, int numConnections) {
-        weights = new double[numConnections];
+        this.activationFunction = activationFunction;
+        this.numConnections = numConnections;
+        this.weights = new double[numConnections];
         randomizeWeights(new Random());
     }
 
@@ -22,6 +25,10 @@ public class Neuron implements INeuron {
 
     public double[] getWeights() {
         return this.weights;
+    }
+
+    public int getNumConnections() {
+        return this.numConnections;
     }
 
     private void randomizeWeights(Random random) {

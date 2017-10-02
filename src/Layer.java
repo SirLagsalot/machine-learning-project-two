@@ -20,4 +20,12 @@ public class Layer {
         }
         return outputs;
     }
+
+    public int getNumNodes() {
+        return this.size;
+    }
+
+    public int getNumInputs() {
+        return this.neurons.get(0).getNumConnections();
+    }
 }
