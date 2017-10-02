@@ -1,3 +1,4 @@
 public interface IActivationFunction {
-    int process(double neuronOutput);
+    double compute(double value);
+    double computeDerivative(double value);
 }

@@ -2,22 +2,22 @@ import java.util.Random;
 
 public class Neuron implements INeuron {
 
-    private IActivationFunction activationFunction;
     private double[] weights;
+    private IActivationFunction activationFunction;
 
     public Neuron(IActivationFunction activationFunction, int numConnections) {
         weights = new double[numConnections];
         randomizeWeights(new Random());
     }
 
-    public int compute(double[] inputs) {
+    public double propagate(double[] inputs) {
         double sum = 0;
 
         for (int i = 0; i < inputs.length - 1; i++) {
             sum += (weights[i] * inputs[i]);
         }
 
-        return this.activationFunction.process(sum);
+        return this.activationFunction.compute(sum);
     }
 
     public double[] getWeights() {

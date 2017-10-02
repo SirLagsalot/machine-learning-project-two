@@ -8,6 +8,8 @@ public class FeedForwardNetwork extends NeuralNetwork {
 
     private IActivationFunction activationFunction;
 
+    private ArrayList<Layer> layers;
+
     private ArrayList<Neuron> inputLayer;
     private ArrayList<ArrayList<Neuron>> hiddenLayers;
     private ArrayList<Neuron> outputLayer;
