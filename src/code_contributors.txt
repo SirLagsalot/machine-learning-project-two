@@ -1,0 +1,9 @@
+current plan for coding:
+
+data genorator - zach
+MLP - zach
+5x2 - keely
+squared loss - keely
+RBF - karen
+tanh - karen
+gaussian - karen
