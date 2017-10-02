@@ -1,4 +1,4 @@
-public class LinearFunction implements IActivationFunction {
+public class GaussianFunction implements IActivationFunction {
 
     @Override
     public int process(double neuronOutput) {
