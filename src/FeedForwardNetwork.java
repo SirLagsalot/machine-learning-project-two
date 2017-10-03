@@ -23,17 +23,21 @@ public class FeedForwardNetwork extends NeuralNetwork {
     }
 
     @Override
-    public double approximate() {
-        return 0;
+    public double approximate(Double[] inputs) {
+        return this.execute(inputs);
     }
 
     // Execute forward propagation, return error
     private double forwardPropagation(Sample sample) {
-        ArrayList<Double> inputs = new ArrayList<>(Arrays.asList(sample.inputs));
+        return this.execute(sample.inputs) - sample.output;
+    }
+
+    private double execute(Double[] inputs) {
+        ArrayList<Double> outputs = new ArrayList<>(Arrays.asList(inputs));
         for (int i = 1; i < layers.size(); i++) {
-            inputs = layers.get(i).execute(inputs);
+            outputs = layers.get(i).execute(outputs);
         }
-        return sample.output - inputs.get(0);
+        return outputs.get(0);
     }
 
 

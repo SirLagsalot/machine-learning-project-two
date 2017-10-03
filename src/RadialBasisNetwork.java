@@ -17,7 +17,7 @@ public class RadialBasisNetwork extends NeuralNetwork {
     }
 
     @Override
-    public double approximate() {
+    public double approximate(Double[] inputs) {
         return 0;
     }
 }
