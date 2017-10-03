@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class RadialBasisNetwork extends NeuralNetwork {
 
     private int gaussiasnFunctions;
@@ -10,7 +12,7 @@ public class RadialBasisNetwork extends NeuralNetwork {
     }
 
     @Override
-    public void train() {
+    public void train(List<Sample> samples) {
 
     }
 

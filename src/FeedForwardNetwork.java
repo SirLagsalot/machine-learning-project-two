@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class FeedForwardNetwork extends NeuralNetwork {
 
@@ -13,13 +15,30 @@ public class FeedForwardNetwork extends NeuralNetwork {
     }
 
     @Override
-    public void train() {
-
+    public void train(List<Sample> samples) {
+        for (Sample sample : samples) {
+            double error = this.forwardPropagation(sample);
+            this.backPropagation(error);
+        }
     }
 
     @Override
     public double approximate() {
         return 0;
+    }
+
+    // Execute forward propagation, return error
+    private double forwardPropagation(Sample sample) {
+        ArrayList<Double> inputs = new ArrayList<>(Arrays.asList(sample.inputs));
+        for (int i = 1; i < layers.size(); i++) {
+            inputs = layers.get(i).execute(inputs);
+        }
+        return sample.output - inputs.get(0);
+    }
+
+
+    private void backPropagation(double error) {
+
     }
 
     private void initializeNeurons(int numHidden, int numNodes, IActivationFunction activationFunc) {
@@ -34,6 +53,6 @@ public class FeedForwardNetwork extends NeuralNetwork {
         }
 
         // Output layer
-        this.layers.add(new Layer(1, this.layers.get(this.layers.size()).getNumNodes(), activationFunc));
+        this.layers.add(new Layer(this.outputs, this.layers.get(this.layers.size() - 1).getNumNodes(), activationFunc));
     }
 }
