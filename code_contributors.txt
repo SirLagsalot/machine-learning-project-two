@@ -1,6 +1,6 @@
 current plan for coding:
 
-data generator - zach
+data generator - zach #done
 MLP - zach
 5x2 - keely
 squared loss - keely
