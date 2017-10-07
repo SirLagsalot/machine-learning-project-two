@@ -26,11 +26,16 @@ public class Neuron {
             sum += (weights[i] * inputs.get(i));
         }
 
-        return this.activationFunction.compute(sum);
+        this.output = this.activationFunction.compute(sum);
+        return this.output;
     }
 
     public double getWeight(int index) {
         return this.weights[index];
+    }
+
+    public void setWeight(int index, double weight) {
+        this.weights[index] += weight;
     }
 
     private void randomizeWeights(Random random) {

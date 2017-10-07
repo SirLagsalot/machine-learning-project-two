@@ -3,11 +3,11 @@ import java.util.List;
 
 public class SampleGenerator {
 
-    public static List<Sample> generateSamples(int numSamples, int numInputs, int maxInputVal) {
+    public static List<Sample> generateSamples(int numSamples, int numInputs, int maxInputVal, int numOutputs) {
         ArrayList<Sample> samples = new ArrayList<>(numSamples);
 
         for (int i = 0; i < numSamples; i++) {
-            Sample sample = new Sample(numInputs, maxInputVal);
+            Sample sample = new Sample(numInputs, maxInputVal, numOutputs);
             sample.outputs[0] = computeRosenbrockOutput(sample.inputs);
             samples.add(sample);
         }

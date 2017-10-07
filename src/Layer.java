@@ -25,7 +25,7 @@ public class Layer {
         return this.neurons;
     }
 
-    public int getSize() {
+    public int size() {
         return this.size;
     }
 }
