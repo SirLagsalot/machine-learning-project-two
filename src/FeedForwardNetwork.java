@@ -10,12 +10,12 @@ public class FeedForwardNetwork extends NeuralNetwork {
     private double learningRate;
 
     public FeedForwardNetwork(int inputs, int outputs, int numHiddenLayers, int numNeuronsPerHiddenLayer,
-                              double learningRate, boolean momentum, IActivationFunction activationFunc) {
+                              double learningRate, boolean momentum, IActivationFunction activationFunction) {
         super(inputs, outputs);
         this.momentum = momentum;
         this.learningRate = learningRate;
-        this.activationFunction = activationFunc;
-        this.initializeNeurons(numHiddenLayers, numNeuronsPerHiddenLayer, learningRate, activationFunc);
+        this.activationFunction = activationFunction;
+        this.initializeNeurons(numHiddenLayers, numNeuronsPerHiddenLayer, learningRate, activationFunction);
     }
 
     @Override
