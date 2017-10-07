@@ -5,11 +5,11 @@ public class Layer {
     private int size;
     private ArrayList<Neuron> neurons;
 
-    public Layer(int size, int inputs, IActivationFunction activationFunction) {
+    public Layer(int size, int inputs, double learningRate, IActivationFunction activationFunction) {
         this.size = size;
         this.neurons = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            this.neurons.add(new Neuron(activationFunction, inputs));
+            this.neurons.add(new Neuron(inputs, learningRate, activationFunction));
         }
     }
 
@@ -21,11 +21,11 @@ public class Layer {
         return outputs;
     }
 
-    public int getNumNodes() {
-        return this.size;
+    public ArrayList<Neuron> getNeurons() {
+        return this.neurons;
     }
 
-    public int getNumInputs() {
-        return this.neurons.get(0).getNumInputs();
+    public int getSize() {
+        return this.size;
     }
 }

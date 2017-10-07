@@ -8,7 +8,7 @@ public class SampleGenerator {
 
         for (int i = 0; i < numSamples; i++) {
             Sample sample = new Sample(numInputs, maxInputVal);
-            sample.output = computeRosenbrockOutput(sample.inputs);
+            sample.outputs[0] = computeRosenbrockOutput(sample.inputs);
             samples.add(sample);
         }
 
