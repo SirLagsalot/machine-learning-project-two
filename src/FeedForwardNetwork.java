@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class FeedForwardNetwork extends NeuralNetwork {
@@ -22,7 +23,7 @@ public class FeedForwardNetwork extends NeuralNetwork {
         for (Sample sample : samples) {
             double[] outputs = this.forwardPropagation(sample.inputs);
             double error = (sample.outputs[0] - outputs[0]) * this.activationFunction.computeDerivative(outputs[0]);
-            System.out.println(error);
+            //   System.out.println(error);
             this.backPropagate(sample.outputs);
             this.updateWeights();
         }
@@ -45,27 +46,26 @@ public class FeedForwardNetwork extends NeuralNetwork {
     }
 
     private void backPropagate(double[] expected) {
-        for (int i = this.layers.size() - 1; i > 0; i--) {
+        for (int i = this.layers.size() - 1; i >= 0; i--) {
             Layer layer = this.layers.get(i);
-            int length = layer.size() - 1;
             List<Double> errors = new ArrayList<>();
 
-            if (i == length) {                                  // Output layer
-                for (int j = 0; j < length; j++) {
+            if (i == this.layers.size() - 1) {                                  // Output layer
+                for (int j = 0; j < layer.size(); j++) {
                     errors.add(expected[j] - layer.getOutput(j));
                 }
             } else {                                            // Hidden layers
-                for (int j = 0; j < length; j++) {
+                for (int j = 0; j < layer.size(); j++) {
                     double error = 0.0;
                     Layer prevLayer = this.layers.get(i + 1);
-                    for (int k = 0; k < prevLayer.size() - 1; k++) {
-                        error += prevLayer.getWeight(k, j) * prevLayer.getDelta(j);
+                    for (int k = 0; k < prevLayer.size(); k++) {
+                        error += prevLayer.getWeight(k, j) * prevLayer.getDelta(k);
                     }
                     errors.add(error);
                 }
             }
 
-            for (int j = 0; j < length; j++) {
+            for (int j = 0; j < layer.size(); j++) {
                 double delta = errors.get(j) * this.activationFunction.computeDerivative(layer.getOutput(j));
                 layer.setDelta(j, delta);
             }
@@ -74,39 +74,8 @@ public class FeedForwardNetwork extends NeuralNetwork {
 
     private void updateWeights() {
         for (int i = 0; i < this.layers.size() - 1; i++) {
-
+            System.out.println(Arrays.toString(this.layers.get(i).getDeltas()));
         }
-    }
-
-
-    private void backPropagation(double[] errors, double[] outputs) {
-        // Output Layer
-//        ArrayList<Neuron> outputLayer = this.layers.get(this.layers.size() - 1).getNeurons();
-//        for (int i = 0; i < outputLayer.size(); i++) {
-//            Double delta = errors[i] * this.activationFunction.computeDerivative(outputs[i]);
-//            outputLayer.get(i).setDelta(delta);
-//        }
-
-//        // Hidden Layers
-//        for (int k = this.layers.size() - 2; k >= 0; k--) {
-//            for (int i = 0; i < this.layers.get(k).size(); i++) {
-//                double error = 0.0;
-//                for (int j = 0; j < this.layers.get(k + 1).size(); j++) {
-//                    Neuron neuron = this.getNeron(k + 1, j);
-//                    error += neuron.getDelta() * neuron.getWeight(i);
-//                }
-//
-//                Neuron neuron = this.getNeron(k, i);
-//                neuron.setDelta(error * this.activationFunction.computeDerivative(neuron.getOutput()));
-//            }
-//
-//            for (int i = 0; i < this.layers.get(k + 1).size(); i++) {
-//                for (int j = 0; j < this.layers.get(k).size(); j++) {
-//                    double updatedWeight = this.learningRate * this.getNeron(k + 1, i).getDelta() * this.getNeron(k, j).getOutput();
-//                    this.getNeron(k + 1, i).setWeight(j, updatedWeight);
-//                }
-//            }
-//        }
     }
 
     private void initializeNeurons(int numLayers, int hiddenNodes) {

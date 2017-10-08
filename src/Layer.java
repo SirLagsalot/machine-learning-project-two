@@ -46,6 +46,10 @@ public class Layer {
         return this.deltas[index];
     }
 
+    public double[] getDeltas() {
+        return this.deltas;
+    }
+
     public void setDelta(int index, double delta) {
         this.deltas[index] = delta;
     }
