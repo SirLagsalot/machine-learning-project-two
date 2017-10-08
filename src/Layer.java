@@ -42,6 +42,10 @@ public class Layer {
         return this.outputs[index];
     }
 
+    public double[] getOutputs() {
+        return this.outputs;
+    }
+
     public double getDelta(int index) {
         return this.deltas[index];
     }
@@ -56,6 +60,14 @@ public class Layer {
 
     public double getWeight(int neuronIndex, int inputIndex) {
         return this.weights[neuronIndex][inputIndex];
+    }
+
+    public void setWeight(int neuronIndex, int inputIndex, double weight) {
+        this.weights[neuronIndex][inputIndex] = weight;
+    }
+
+    public void updateBias(int index, double learningRate) {
+        this.bias[index] += learningRate * this.deltas[index];
     }
 
     private void initialize() {

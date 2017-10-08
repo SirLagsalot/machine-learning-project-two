@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class FeedForwardNetwork extends NeuralNetwork {
@@ -21,21 +20,21 @@ public class FeedForwardNetwork extends NeuralNetwork {
     @Override
     public void train(List<Sample> samples) {
         for (Sample sample : samples) {
-            double[] outputs = this.forwardPropagation(sample.inputs);
-            double error = (sample.outputs[0] - outputs[0]) * this.activationFunction.computeDerivative(outputs[0]);
-            //   System.out.println(error);
+            double[] outputs = this.forwardPropagate(sample.inputs);
+            double error = (sample.outputs[0] - outputs[0]);
+            System.out.println(error);
             this.backPropagate(sample.outputs);
-            this.updateWeights();
+            this.updateWeights(sample.inputs);
         }
     }
 
     @Override
     public double[] approximate(double[] inputs) {
-        return this.forwardPropagation(inputs);
+        return this.forwardPropagate(inputs);
     }
 
     // Execute forward propagation, return error
-    private double[] forwardPropagation(double[] inputs) {
+    private double[] forwardPropagate(double[] inputs) {
         double[] networkOutputs = inputs;
 
         for (Layer layer : this.layers) {
@@ -50,7 +49,7 @@ public class FeedForwardNetwork extends NeuralNetwork {
             Layer layer = this.layers.get(i);
             List<Double> errors = new ArrayList<>();
 
-            if (i == this.layers.size() - 1) {                                  // Output layer
+            if (i == this.layers.size() - 1) {                  // Output layer
                 for (int j = 0; j < layer.size(); j++) {
                     errors.add(expected[j] - layer.getOutput(j));
                 }
@@ -72,9 +71,17 @@ public class FeedForwardNetwork extends NeuralNetwork {
         }
     }
 
-    private void updateWeights() {
-        for (int i = 0; i < this.layers.size() - 1; i++) {
-            System.out.println(Arrays.toString(this.layers.get(i).getDeltas()));
+    private void updateWeights(double[] sampleInputs) {
+        for (int i = 0; i < this.layers.size(); i++) {
+            Layer layer = this.layers.get(i);
+            double[] inputs = i == 0 ? sampleInputs : this.layers.get(i - 1).getOutputs();
+            for (int j = 0; j < layer.size(); j++) {
+                for (int k = 0; k < inputs.length - 1; k++) {
+                    double updatedWeight = layer.getWeight(j, k) + (this.learningRate * layer.getDelta(j) * inputs[k]);
+                    layer.setWeight(j, k, updatedWeight);
+                }
+                layer.updateBias(j, this.learningRate);
+            }
         }
     }
 
