@@ -16,7 +16,7 @@ public class SampleGenerator {
         return samples;
     }
 
-    private static double computeRosenbrockOutput(double[] inputs) {
+    public static double computeRosenbrockOutput(double[] inputs) {
         double sum = 0;
 
         for (int i = 0; i < inputs.length - 1; i++) {
@@ -36,6 +36,23 @@ public class SampleGenerator {
                 sample.inputs[j] = (double) random.nextInt(5);
             }
             sample.outputs[0] = computeRosenbrockOutput(sample.inputs);
+            samples.add(sample);
+        }
+
+        return samples;
+    }
+
+    // Samples for cos(a * b) where a, b are doubles [0, 1]
+    public static List<Sample> generateSuperEasySamples(int numSamples) {
+        ArrayList<Sample> samples = new ArrayList<>(numSamples);
+        Random random = new Random();
+
+        for (int i = 0; i < numSamples; i++) {
+            Sample sample = new Sample(2);
+            for (int j = 0; j < 2; j++) {
+                sample.inputs[j] = random.nextDouble();
+            }
+            sample.outputs[0] = Math.cos(sample.inputs[0] * sample.inputs[1]);
             samples.add(sample);
         }
 

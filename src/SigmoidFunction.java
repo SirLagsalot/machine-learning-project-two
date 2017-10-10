@@ -2,7 +2,7 @@ public class SigmoidFunction implements IActivationFunction {
 
     @Override
     public double compute(double value) {
-        return 1 / (1 + Math.exp(value * -1));
+        return 1 / (1 + Math.exp(-value));
     }
 
     @Override
