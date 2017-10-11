@@ -18,7 +18,6 @@ public class Tester {
             System.out.println("Inputs: " + Arrays.toString(sample.inputs) + " Approx: " + networkOutput + " Actual: " + sample.outputs[0]);
             System.out.println("Error: " + Math.abs(networkOutput - sample.outputs[0]) + "\n");
         }
-
     }
 
     public static void crossValidate() {
@@ -38,13 +37,13 @@ public class Tester {
             IFunctionApproximator radial = new RadialBasisNetwork(inputs, outputs, 10);
 
             feed.train(train);
-           // radial.train(train);
+            // radial.train(train);
 
             for (int i = 0; i < test.size(); i++) {
                 Sample sample = test.get(i);
                 double[] networkOutput = feed.approximate(sample.inputs);
                 double errorSum = 0;
-                for(int j = 0; j < test.size(); j++) {
+                for (int j = 0; j < test.size(); j++) {
                     double error = Math.abs(networkOutput[j] - sample.outputs[j]);
                     errorSum = errorSum + error;
                 }
@@ -52,4 +51,3 @@ public class Tester {
         }
     }
 }
-//mean,
