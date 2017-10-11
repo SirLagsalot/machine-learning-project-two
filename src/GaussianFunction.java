@@ -1,7 +1,7 @@
 public class GaussianFunction implements IActivationFunction {
 
-    double sigma = 0.0;
-    double mean = RadialBasisNetwork.getMean(); //figure this out
+    double sigma = 0.0; // maxDistance/sqrt(2* number of clusters)
+    double mean = 0.0; //RadialBasisNetwork.getMean(); figure this out
 
     public double compute(double value) {
         // 1/(sqrt(2*pi*sigma) * e^(-(current - mean)^2/(2*sigma^2))
