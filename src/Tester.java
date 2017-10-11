@@ -1,23 +1,24 @@
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Tester {
 
     public static void main(String[] args) {
-        int[] layers = new int[]{2, 200, 1};
+        int[] layers = new int[]{3, 50, 1};
 
-        IFunctionApproximator neuralNetwork = new FeedForwardNetwork(2, 1, layers, 0.01, new SigmoidFunction());
-        List<Sample> trainingSamples = SampleGenerator.generateSuperEasySamples(10000);
+        IFunctionApproximator neuralNetwork = new FeedForwardNetwork(2, 1, layers, 0.1, new SigmoidFunction());
+        List<Sample> trainingSamples = SampleGenerator.generateSamples(10000, 2, 5, 1);
         neuralNetwork.train(trainingSamples);
 
-        List<Sample> testSamples = SampleGenerator.generateSuperEasySamples(10);
-
-        for (Sample sample : testSamples) {
-            double networkOutput = neuralNetwork.approximate(sample.inputs)[0];
-            System.out.println("Inputs: " + Arrays.toString(sample.inputs) + " Approx: " + networkOutput + " Actual: " + sample.outputs[0]);
-            System.out.println("Error: " + Math.abs(networkOutput - sample.outputs[0]) + "\n");
-        }
+//        List<Sample> testSamples = SampleGenerator.generateSuperEasySamples(10);
+//
+//        for (Sample sample : testSamples) {
+//            double networkOutput = neuralNetwork.approximate(sample.inputs)[0];
+//            System.out.println("Inputs: " + Arrays.toString(sample.inputs) + " Approx: " + networkOutput + " Actual: " + sample.outputs[0]);
+//            System.out.println("Error: " + Math.abs(networkOutput - sample.outputs[0]) + "\n");
+//        }
     }
 
     public static void crossValidate() {
@@ -44,7 +45,7 @@ public class Tester {
             //iterates through test and calculates the aproximated values
             for (int i = 0; i < test.size(); i++) {
                 Sample sample = test.get(i); //gets element in test at i
-                double[] networkOutput = FFN.approximate(sample.inputs); //gets the approximated values of the inputs and puts them in a double array
+                double[] networkOutput = FFN.approximate(sample.inputs); //gets the approximated values of the numInputs and puts them in a double array
 
                 for (int j = 0; j < test.size(); j++) { //calculates the error for one input
                     double error = Math.abs(networkOutput[j] - sample.outputs[j]);
@@ -56,14 +57,14 @@ public class Tester {
             double sum = 0;
             for (int i = 0; i < totalErrorSum.length; i++) {
                 sum += totalErrorSum[i];
-                mean = sum/totalErrorSum.length;
+                mean = sum / totalErrorSum.length;
             }
             System.out.print("the mean of the Errors is: " + mean);
 
             double sd = 0;
             double standardDeviation = 0;
             for (int i = 0; i < totalErrorSum.length; i++) {
-                sd += ((totalErrorSum[i] - mean)*(totalErrorSum[i] - mean)) / totalErrorSum.length - 1;
+                sd += ((totalErrorSum[i] - mean) * (totalErrorSum[i] - mean)) / totalErrorSum.length - 1;
                 standardDeviation = Math.sqrt(sd);
             }
             System.out.print("the standard deviation of the errors is: " + standardDeviation);

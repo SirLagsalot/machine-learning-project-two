@@ -26,6 +26,26 @@ public class SampleGenerator {
         return sum;
     }
 
+    public static List<Sample> generateQuadraticSamples() {
+        int numSamples = 10000;
+        ArrayList<Sample> samples = new ArrayList<>(numSamples);
+        Random random = new Random();
+
+        for (int i = 0; i < numSamples; i++) {
+            Sample sample = new Sample(3);
+            int a = random.nextInt(10);
+            int b = random.nextInt(10);
+            int c = random.nextInt(10);
+
+            sample.inputs = new double[]{a, b, c};
+            sample.outputs = new double[]{(-b + Math.sqrt(Math.abs(Math.pow(b, 2) - 4 * a * c))) / (2 * a)};
+            samples.add(sample);
+        }
+
+        return samples;
+    }
+
+
     public static List<Sample> generateEasySamples(int numSamples, int numInputs) {
         ArrayList<Sample> samples = new ArrayList<>(numSamples);
         Random random = new Random();
