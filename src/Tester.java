@@ -18,5 +18,7 @@ public class Tester {
             System.out.println("Inputs: " + Arrays.toString(sample.inputs) + " Approx: " + networkOutput + " Actual: " + sample.outputs[0]);
             System.out.println("Error: " + Math.abs(networkOutput - sample.outputs[0]) + "\n");
         }
+
+        //Changes
     }
 }
