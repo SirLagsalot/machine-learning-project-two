@@ -2,11 +2,14 @@ import java.util.List;
 
 public class RadialBasisNetwork extends NeuralNetwork {
 
-    private int gaussiasnFunctions;
+    private IActivationFunction activationFunction;
+    private int numNeurons;
+    private double[] means;
 
-    public RadialBasisNetwork(int inputs, int outputs, int gaussianFunctions) {
+    public RadialBasisNetwork(int inputs, int outputs, int numNeurons) {
         super(inputs, outputs);
-        this.gaussiasnFunctions = gaussianFunctions;
+        this.activationFunction = new GaussianFunction();
+        this.numNeurons = numNeurons;
     }
 
     @Override
@@ -20,7 +23,7 @@ public class RadialBasisNetwork extends NeuralNetwork {
     }
 
     //get mean of cluster
-    public double getMean(){
+    public double getMean() {
         return 0.0;
     }
 }

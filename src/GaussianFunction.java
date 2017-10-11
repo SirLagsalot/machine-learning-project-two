@@ -15,7 +15,17 @@ public class GaussianFunction implements IActivationFunction {
         return (value - mean) * Math.exp(-(Math.pow((value - mean), 2) / (2 * Math.pow(sigma, 2)))) / (Math.sqrt(2 * Math.PI) * Math.pow(sigma, (5.0 / 2)));
     }
 
-    public void setMean(double mean) {
+    public double compute(double value, double mean) {
         this.mean = mean;
+        return this.compute(value);
+    }
+
+    public double computeDerivative(double value, double mean) {
+        this.mean = mean;
+        return this.computeDerivative(value);
+    }
+
+    public void setSigma(double sigma) {
+
     }
 }
