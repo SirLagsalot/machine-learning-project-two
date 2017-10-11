@@ -37,11 +37,17 @@ public class FeedForwardNetwork extends NeuralNetwork {
         return this.execute(inputs);
     }
 
-    public double[] execute(double[] input) {
+    /**
+     * Performs a single forward propagation through the network
+     *
+     * @param inputs: The input values to the function
+     * @return values of the output layer neurons
+     */
+    private double[] execute(double[] inputs) {
 
         // Set value of input layer to inputs values
         for (int i = 0; i < this.inputs; i++) {
-            this.layers.get(0).neurons[i].output = input[i];
+            this.layers.get(0).neurons[i].output = inputs[i];
         }
 
         // Loop through neurons in each layer computing output
@@ -71,7 +77,7 @@ public class FeedForwardNetwork extends NeuralNetwork {
         return output;
     }
 
-    public void backPropagate(double[] outputs, double[] networkOutput) {
+    private void backPropagate(double[] outputs, double[] networkOutput) {
 
         // Compute error deltas for output layer
         Neuron[] outputLayer = this.getOutputLayer();
