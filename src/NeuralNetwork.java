@@ -2,8 +2,8 @@ import java.util.List;
 
 public abstract class NeuralNetwork implements IFunctionApproximator {
 
-    int inputs;
-    int outputs;
+    protected int inputs;
+    protected int outputs;
 
     public NeuralNetwork(int inputs, int outputs) {
         this.inputs = inputs;
@@ -12,5 +12,5 @@ public abstract class NeuralNetwork implements IFunctionApproximator {
 
     public abstract void train(List<Sample> samples);
 
-    public abstract Double[] approximate(Double[] inputs);
+    public abstract double[] approximate(double[] inputs);
 }

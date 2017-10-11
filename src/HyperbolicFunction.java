@@ -6,7 +6,7 @@ public class HyperbolicFunction implements IActivationFunction {
     }
 
     @Override
-    public double computeDerivative(double value) { // value here is calculated in compute
+    public double computeDerivative(double value) {
         return 1 - Math.pow(value, 2);
     }
 }

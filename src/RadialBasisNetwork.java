@@ -17,8 +17,8 @@ public class RadialBasisNetwork extends NeuralNetwork {
     }
 
     @Override
-    public Double[] approximate(Double[] inputs) {
-        return new Double[inputs.length];
+    public double[] approximate(double[] inputs) {
+        return new double[inputs.length];
     }
 
     //get mean of cluster
