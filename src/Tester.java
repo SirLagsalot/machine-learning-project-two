@@ -1,33 +1,36 @@
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class Tester {
 
-    public static void main(String[] args) {
-        int[] layers = new int[]{3, 50, 1};
+    /* Tunable Parameters */
+    private static final int numInputs = 2;
+    private static final int numOutputs = 1;
+    private static final int maxInputVal = 3;
+    private static final int numSamples = 10000;
+    private static final int[] layers = new int[]{numInputs, 5, numOutputs};    // Size of each layer
+    private static final int batchSize = 5;
+    private static final double learningRate = 0.05;
+    private static final double momentum = 0.4;                                 // Set to 0 to disable momentum
 
-        IFunctionApproximator neuralNetwork = new FeedForwardNetwork(2, 1, layers, 0.1, new SigmoidFunction());
-        List<Sample> trainingSamples = SampleGenerator.generateSamples(10000, 2, 5, 1);
+    public static void main(String[] args) {
+
+        IFunctionApproximator neuralNetwork = new FeedForwardNetwork(layers, learningRate, batchSize, momentum, new SigmoidFunction());
+        List<Sample> trainingSamples = SampleGenerator.generateSamples(numSamples, numInputs, maxInputVal, numOutputs);
         neuralNetwork.train(trainingSamples);
 
-//        List<Sample> testSamples = SampleGenerator.generateSuperEasySamples(10);
-//
-//        for (Sample sample : testSamples) {
-//            double networkOutput = neuralNetwork.approximate(sample.inputs)[0];
-//            System.out.println("Inputs: " + Arrays.toString(sample.inputs) + " Approx: " + networkOutput + " Actual: " + sample.outputs[0]);
-//            System.out.println("Error: " + Math.abs(networkOutput - sample.outputs[0]) + "\n");
-//        }
+        List<Sample> testSamples = SampleGenerator.generateSamples(numSamples, numInputs, maxInputVal, numOutputs);
+
+        double error = 0.0;
+        for (Sample sample : testSamples) {
+            double output = neuralNetwork.approximate(sample.inputs)[0];
+            error += Math.abs(output - sample.outputs[0]);
+        }
+
+        System.out.println("Avg Error: " + error / numSamples);
     }
 
     public static void crossValidate() {
-        int numSamples = 10000;
-        int inputs = 2;
-        int maxInput = 5;
-        int outputs = 1;
-        int[] layers = {2, 50, 1};
-        double learningRate = 0.01;
         double errorSum = 0;
         double[] totalErrorSum = new double[numSamples];
 
@@ -36,13 +39,13 @@ public class Tester {
             List<Sample> train = samples.subList(0, (samples.size() / 2));
             List<Sample> test = samples.subList((samples.size() / 2), samples.size());
 
-            IFunctionApproximator FFN = new FeedForwardNetwork(inputs, outputs, layers, learningRate, new SigmoidFunction());
-            IFunctionApproximator RBN = new RadialBasisNetwork(inputs, outputs, 10);
+            IFunctionApproximator FFN = new FeedForwardNetwork(layers, learningRate, batchSize, momentum, new SigmoidFunction());
+            IFunctionApproximator RBN = new RadialBasisNetwork(numInputs, numOutputs, 10);
 
             FFN.train(train);
             // radial.train(train);
 
-            //iterates through test and calculates the aproximated values
+            //iterates through test and calculates the approximated values
             for (int i = 0; i < test.size(); i++) {
                 Sample sample = test.get(i); //gets element in test at i
                 double[] networkOutput = FFN.approximate(sample.inputs); //gets the approximated values of the numInputs and puts them in a double array

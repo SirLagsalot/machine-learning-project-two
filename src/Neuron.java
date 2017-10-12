@@ -2,18 +2,21 @@ import java.util.Random;
 
 public class Neuron {
 
-    private double output = 0.0;
-    private double bias = 1.0;
-    private double delta = 0.0;
+    private double output;
+    private double bias;
+    private double delta;
     private double[] weights;
+    private double[] previousWeightUpdates;
 
     public Neuron(int prevLayerSize) {
         Random random = new Random();
 
         this.weights = new double[prevLayerSize];
+        this.previousWeightUpdates = new double[prevLayerSize];
         for (int i = 0; i < this.weights.length; i++) {
-            this.weights[i] = random.nextDouble();
+            this.weights[i] = random.nextDouble() / 100000000;
         }
+        this.bias = random.nextDouble() / 10000000;
     }
 
     public double getWeight(int index) {
@@ -46,5 +49,13 @@ public class Neuron {
 
     public void setOutput(double output) {
         this.output = output;
+    }
+
+    public double getPreviousWeightUpdate(int index) {
+        return previousWeightUpdates[index];
+    }
+
+    public void setPreviousWeightUpdate(int index, double previousWeightUpdates) {
+        this.previousWeightUpdates[index] = previousWeightUpdates;
     }
 }

@@ -45,34 +45,15 @@ public class SampleGenerator {
         return samples;
     }
 
-
-    public static List<Sample> generateEasySamples(int numSamples, int numInputs) {
+    // One input [-3, 3], one output sin(input)
+    public static List<Sample> generateSinSamples(int numSamples) {
         ArrayList<Sample> samples = new ArrayList<>(numSamples);
         Random random = new Random();
 
         for (int i = 0; i < numSamples; i++) {
-            Sample sample = new Sample(numInputs);
-            for (int j = 0; j < numInputs; j++) {
-                sample.inputs[j] = (double) random.nextInt(5);
-            }
-            sample.outputs[0] = computeRosenbrockOutput(sample.inputs);
-            samples.add(sample);
-        }
-
-        return samples;
-    }
-
-    // Samples for cos(a * b) where a, b are doubles [0, 1]
-    public static List<Sample> generateSuperEasySamples(int numSamples) {
-        ArrayList<Sample> samples = new ArrayList<>(numSamples);
-        Random random = new Random();
-
-        for (int i = 0; i < numSamples; i++) {
-            Sample sample = new Sample(2);
-            for (int j = 0; j < 2; j++) {
-                sample.inputs[j] = random.nextDouble();
-            }
-            sample.outputs[0] = Math.cos(sample.inputs[0] * sample.inputs[1]);
+            Sample sample = new Sample(1);
+            sample.inputs = new double[]{(random.nextDouble() * 3) - 3};
+            sample.outputs[0] = Math.sin(sample.inputs[0]);
             samples.add(sample);
         }
 

@@ -4,13 +4,19 @@ import java.util.List;
 public class FeedForwardNetwork extends NeuralNetwork {
 
     private int numLayers;
+    private int batchSize;
     private double learningRate;
+    private double alpha;
     private ArrayList<Layer> layers;
     private IActivationFunction activationFunction;
 
-    public FeedForwardNetwork(int numInputs, int numOutputs, int[] layerDimensions, double learningRate, IActivationFunction activationFunction) {
-        super(numInputs, numOutputs);
+    private final boolean debug = true;
+
+    public FeedForwardNetwork(int[] layerDimensions, double learningRate, int batchSize, double alpha, IActivationFunction activationFunction) {
+        super(layerDimensions[0], layerDimensions[layerDimensions.length - 1]);
         this.learningRate = learningRate;
+        this.batchSize = batchSize;
+        this.alpha = alpha;
         this.activationFunction = activationFunction;
 
         this.initializeLayers(layerDimensions);
@@ -21,19 +27,20 @@ public class FeedForwardNetwork extends NeuralNetwork {
         int updateCount = 0;
         for (Sample sample : samples) {
             updateCount++;
-            double networkOutput[] = this.forwardPropagate(sample.inputs);
+            double networkOutput = this.forwardPropagate(sample.inputs)[0];
+            double trueOutput = sample.outputs[0];
+            //noinspection ConstantConditions
+            if (this.debug) {
+                System.out.println("True: " + trueOutput + ", Approx: " + networkOutput + ", Err: " + (networkOutput - trueOutput));
+            }
             this.backPropagateError(sample.outputs);
-            if (updateCount % 5 == 0) {
+            if (updateCount % this.batchSize == 0) {
                 this.updateWeights();
+                this.resetDeltas();
                 updateCount = 0;
             }
 
-            double error = 0.0;
-            for (int i = 0; i < sample.outputs.length; i++) {
-                error += Math.abs(networkOutput[i] - sample.outputs[i]);
-            }
-
-            System.out.println("Error: " + error + " ");
+            learningRate = learningRate * .95;
         }
     }
 
@@ -120,8 +127,11 @@ public class FeedForwardNetwork extends NeuralNetwork {
                 for (int j = 0; j < currentLayer.size; j++) {
                     Neuron neuron = currentLayer.getNeuron(j);
                     for (int k = 0; k < inputs.size(); k++) {
-                        double updatedWeight = this.learningRate * neuron.getDelta() * inputs.get(k);
+                        double weightChange = neuron.getWeight(k) + (this.learningRate * neuron.getDelta() * inputs.get(k));
+                        double previousWeightChange = neuron.getPreviousWeightUpdate(k);
+                        double updatedWeight = ((1 - this.alpha) * weightChange) + (this.alpha * previousWeightChange);
                         neuron.setWeight(k, updatedWeight);
+                        neuron.setPreviousWeightUpdate(k, updatedWeight);
                     }
                     neuron.setBias(neuron.getBias() + this.learningRate * neuron.getDelta());
                 }
@@ -132,6 +142,10 @@ public class FeedForwardNetwork extends NeuralNetwork {
                 }
             }
         }
+    }
+
+    private void resetDeltas() {
+        this.layers.forEach(layer -> layer.getNeurons().forEach(neuron -> neuron.setDelta(0)));
     }
 
     private void initializeLayers(int[] dimensions) {
