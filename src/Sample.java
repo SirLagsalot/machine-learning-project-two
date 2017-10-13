@@ -9,6 +9,11 @@ public class Sample {
         this.outputs = new double[1];
     }
 
+    public Sample(double[] inputs, double[] outputs) {
+        this.inputs = inputs;
+        this.outputs = outputs;
+    }
+
     public Sample(int numInputs, int maxInputVal, int numOutputs) {
         this.inputs = new double[numInputs];
         this.outputs = new double[numOutputs];
