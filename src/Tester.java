@@ -1,7 +1,8 @@
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class Tester {
 
@@ -16,7 +17,6 @@ public class Tester {
     private static final double momentum = 0.4;
 
     public static void main(String[] args) {
-
         IFunctionApproximator neuralNetwork = new FeedForwardNetwork(layers, learningRate, batchSize, momentum, new SigmoidFunction());
         List<Sample> trainingSamples = SampleGenerator.generateSamples(numSamples, numInputs, maxInputVal, numOutputs);
         neuralNetwork.train(trainingSamples);
@@ -32,7 +32,7 @@ public class Tester {
         System.out.println("Avg Error: " + error / numSamples);
     }
 
-    //execute 5X2 cross validation on both data sets
+    // Execute a 5x2 cross validation for both networks computing the mean and standard deviation of their errors
     public static void crossValidate() {
         int numSamples = 10000;
         int inputs = 2;
@@ -49,6 +49,7 @@ public class Tester {
         List<Double> rbfErrors = new ArrayList<>();
 
         for (int k = 0; k < 5; k++) {
+            Collections.shuffle(samples);
             List<Sample> set1 = samples.subList(0, (samples.size() / 2));
             List<Sample> set2 = samples.subList((samples.size() / 2), samples.size());
 
@@ -67,11 +68,11 @@ public class Tester {
 
         double mean = calcMean(ffnErrors);
         double SD = calcStandardDeviation(mean, ffnErrors);
-        printStats(mean, SD, "FFN");
+        printStats(mean, SD, "Feed Forward");
 
         mean = calcMean(rbfErrors);
         SD = calcStandardDeviation(mean, rbfErrors);
-        printStats(mean, SD, "RBF");
+        printStats(mean, SD, "Radial Basis");
     }
 
     private static List<Double> computeFold(List<Sample> trainSet, List<Sample> testSet, IFunctionApproximator network) {
@@ -79,46 +80,44 @@ public class Tester {
         return getApproximationErrors(testSet, network);
     }
 
-    //iterates through testing set and calculates the approximated values and the error of the samples of the feedforward network
-    public static List<Double> getApproximationErrors(List<Sample> testSet, IFunctionApproximator network) {
+    // Iterates through testing set and calculates the approximated values and the error of the samples of the supplied network
+    private static List<Double> getApproximationErrors(List<Sample> testSet, IFunctionApproximator network) {
         List<Double> totalError = new ArrayList<>(testSet.size());
         for (Sample sample : testSet) {
-            double[] networkOutput = network.approximate(sample.inputs); //gets approximated input values
-            double sampleError = 0;
-            for (int j = 0; j < networkOutput.length; j++) {
-                sampleError += Math.abs(networkOutput[j] - sample.outputs[j]);  //calculates sum of errors for the sample
-            }
-            //put the errorSum of each sample into an array of doubles (FFNtotalError used in mean and SD)
-            totalError.add(sampleError);
+            // Get the network's approximation
+            double[] networkOutput = network.approximate(sample.inputs);
+
+            // Add the error for each sample to the total error
+            totalError.add(IntStream
+                    .range(0, networkOutput.length)
+                    .mapToDouble(j -> Math.abs(networkOutput[j] - sample.outputs[j]))
+                    .sum());
         }
         return totalError;
     }
 
 
-    //calculates the mean of all the samples errors
-    public static double calcMean(List<Double> totalError) {
-        final double[] sum = {0};
-
-        totalError.forEach(error -> sum[0] += error);
-
-        return sum[0] / totalError.size();
+    // Calculates the mean of all the samples errors
+    private static double calcMean(List<Double> totalError) {
+        return totalError
+                .stream()
+                .reduce(0.0, Double::sum) / totalError.size();
     }
 
-    //calculates the standard deviation of all the samples errors
-    public static double calcStandardDeviation(double average, List<Double> totalError) {
-        double standardDeviation = 0;
-        double sd = 0;
-
-        for (int i = 0; i < totalError.size(); i++) {
-            sd += Math.pow((totalError.get(i) - average), 2) / totalError.size();
-            standardDeviation = Math.sqrt(sd);
-        }
-        return standardDeviation;
+    // Calculates the standard deviation of the provided errors
+    private static double calcStandardDeviation(double average, List<Double> totalError) {
+        return Math.sqrt(totalError
+                .stream()
+                .mapToDouble(aDouble -> Math.pow((aDouble - average), 2) / totalError.size())
+                .sum());
     }
 
-    public static void printStats(double mean, double standardDeviation, String networkType) {
-        System.out.println("The Mean of the " + networkType + " errors is: " + mean);
-        System.out.println("The SD of the " + networkType + " errors is: " + standardDeviation);
+    // Writes the mean ans standard deviation to std out
+    private static void printStats(double mean, double standardDeviation, String networkType) {
+        System.out.println("Network type: " + networkType);
+        System.out.println("-------------------------------");
+        System.out.println("Mean error: " + mean);
+        System.out.println("Standard Dev: " + standardDeviation);
     }
 }
 
