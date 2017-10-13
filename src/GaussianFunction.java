@@ -27,6 +27,6 @@ public class GaussianFunction implements IActivationFunction {
     }
 
     public void setSigma(double sigma) {
-
+        //maxDistance/sqrt(2* number of clusters)
     }
 }
