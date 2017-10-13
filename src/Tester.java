@@ -116,8 +116,8 @@ public class Tester {
     private static void printStats(double mean, double standardDeviation, String networkType) {
         System.out.println("Network type: " + networkType);
         System.out.println("-------------------------------");
-        System.out.println("Mean error: " + mean);
-        System.out.println("Standard Dev: " + standardDeviation);
+        System.out.println("Mean error:         " + mean);
+        System.out.println("Standard Deviation: " + standardDeviation);
     }
 }
 
