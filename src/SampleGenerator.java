@@ -4,6 +4,33 @@ import java.util.Random;
 
 public class SampleGenerator {
 
+    public static List<Sample> generateSamples(int numInputs) {
+        int numSamples = (int) Math.pow(numInputs, 2) * 5000;
+        int minValue = -3;
+        int maxValue = 3;
+        double gridWidth = ((double) (maxValue - minValue)) / numSamples * numInputs;
+
+        ArrayList<Double> inputValues = new ArrayList<>();
+        for (double i = (double) minValue; i < maxValue; i += gridWidth) {
+            inputValues.add(i);
+        }
+
+        List<Sample> samples = new ArrayList<>(numSamples);
+
+        for (int i = 0; i < numSamples; i++) {
+            Random random = new Random(System.currentTimeMillis());
+            double[] inputs = new double[numInputs];
+            for (int j = 0; j < numInputs; j++) {
+                inputs[j] = inputValues.get(random.nextInt(inputValues.size()));
+            }
+
+            double[] output = new double[]{computeRosenbrockOutput(inputs)};
+            samples.add(new Sample(inputs, output));
+        }
+
+        return samples;
+    }
+
     public static List<Sample> generateSamples(int numSamples, int numInputs, int maxInputVal, int numOutputs) {
         ArrayList<Sample> samples = new ArrayList<>(numSamples);
 
