@@ -4,13 +4,19 @@ import java.util.List;
 public class FeedForwardNetwork extends NeuralNetwork {
 
     private int numLayers;
+    private int batchSize;
     private double learningRate;
+    private double alpha;
     private ArrayList<Layer> layers;
     private IActivationFunction activationFunction;
 
-    public FeedForwardNetwork(int inputs, int outputs, int[] layerDimensions, double learningRate, IActivationFunction activationFunction) {
-        super(inputs, outputs);
+    private final boolean debug = true;
+
+    public FeedForwardNetwork(int[] layerDimensions, double learningRate, int batchSize, double alpha, IActivationFunction activationFunction) {
+        super(layerDimensions[0], layerDimensions[layerDimensions.length - 1]);
         this.learningRate = learningRate;
+        this.batchSize = batchSize;
+        this.alpha = alpha;
         this.activationFunction = activationFunction;
 
         this.initializeLayers(layerDimensions);
@@ -18,23 +24,29 @@ public class FeedForwardNetwork extends NeuralNetwork {
 
     @Override
     public void train(List<Sample> samples) {
+        int updateCount = 0;
         for (Sample sample : samples) {
-            double networkOutput[] = this.execute(sample.inputs);
-            this.backPropagate(sample.outputs, networkOutput);
-
-            double error = 0.0;
-            for (int i = 0; i < sample.outputs.length; i++) {
-                error += Math.abs(networkOutput[i] - sample.outputs[i]);
+            updateCount++;
+            double networkOutput = this.forwardPropagate(sample.inputs)[0];
+            double trueOutput = sample.outputs[0];
+            //noinspection ConstantConditions
+            if (this.debug) {
+                System.out.println("True: " + trueOutput + ", Approx: " + networkOutput + ", Err: " + (networkOutput - trueOutput));
+            }
+            this.backPropagateError(sample.outputs);
+            if (updateCount % this.batchSize == 0) {
+                this.updateWeights();
+                this.resetDeltas();
+                updateCount = 0;
             }
 
-            double avgError = error / sample.outputs.length;
-            System.out.println("Error: " + avgError);
+            learningRate = learningRate * .95;
         }
     }
 
     @Override
     public double[] approximate(double[] inputs) {
-        return this.execute(inputs);
+        return this.forwardPropagate(inputs);
     }
 
     /**
@@ -43,78 +55,97 @@ public class FeedForwardNetwork extends NeuralNetwork {
      * @param inputs: The input values to the function
      * @return values of the output layer neurons
      */
-    private double[] execute(double[] inputs) {
+    private double[] forwardPropagate(double[] inputs) {
 
-        // Set value of input layer to inputs values
-        for (int i = 0; i < this.inputs; i++) {
-            this.layers.get(0).neurons[i].output = inputs[i];
+        // Set value of input layer to numInputs values
+        for (int i = 0; i < this.numInputs; i++) {
+            this.layers.get(0).getNeuron(i).setOutput(inputs[i]);
         }
 
-        // Loop through neurons in each layer computing output
-        for (int k = 1; k < this.layers.size(); k++) {                      // Iterate over layers starting at first hidden
-            for (int i = 0; i < this.layers.get(k).size; i++) {             // Iterate over neurons in each layer
+        for (int i = 1; i < this.numLayers; i++) {              // Loop over each layer in the network
+            Layer currentLayer = this.layers.get(i);
+            Layer prevLayer = this.layers.get(i - 1);
+            for (int j = 0; j < currentLayer.size; j++) {       // Loop over each neuron in the layer
                 double neuronOutput = 0.0;
-                for (int j = 0; j < this.layers.get(k - 1).size; j++) {
-                    double weightJ = this.layers.get(k).neurons[i].weights[j];
-                    double inputJ = this.layers.get(k - 1).neurons[j].output;
-                    neuronOutput += weightJ * inputJ;
+                Neuron currentNeuron = currentLayer.getNeuron(j);
+                for (int k = 0; k < prevLayer.size; k++) {      // Loop over each of the current neuron's inputs
+                    neuronOutput += currentNeuron.getWeight(k) * prevLayer.getNeuron(k).getOutput();
                 }
-
-                neuronOutput += this.layers.get(k).neurons[i].bias;         // Add bias
-
-                this.layers.get(k).neurons[i].output = this.activationFunction.compute(neuronOutput);
-            }
-        }
-
-        // Collect the output from the output layer
-        Neuron[] outputLayer = this.getOutputLayer();
-
-        double output[] = new double[outputs];
-        for (int i = 0; i < this.outputs; i++) {
-            output[i] = outputLayer[i].output;
-        }
-
-        return output;
-    }
-
-    private void backPropagate(double[] outputs, double[] networkOutput) {
-
-        // Compute error deltas for output layer
-        Neuron[] outputLayer = this.getOutputLayer();
-        for (int i = 0; i < this.outputs; i++) {
-            double error = outputs[i] - networkOutput[i];
-            outputLayer[i].delta = error * this.activationFunction.computeDerivative(networkOutput[i]);
-        }
-
-
-        // Compute error deltas for hidden layers
-        for (int k = this.numLayers - 2; k >= 0; k--) {
-            for (int i = 0; i < this.layers.get(k).size; i++) {
-                double error = 0.0;
-                for (int j = 0; j < this.layers.get(k + 1).size; j++) {
-                    error += this.layers.get(k + 1).neurons[j].delta * this.layers.get(k + 1).neurons[j].weights[i];
+                if (i != this.numLayers - 1) {                  // Apply activation function if not the output layer
+                    neuronOutput = this.activationFunction.compute(neuronOutput + currentNeuron.getBias());
                 }
+                currentNeuron.setOutput(neuronOutput);
+            }
+        }
 
-                this.layers.get(k).neurons[i].delta = error * this.activationFunction.computeDerivative(this.layers.get(k).neurons[i].output);
+        // Collect values from output layer neurons
+        double[] outputs = new double[this.numOutputs];
+        Layer outputLayer = this.layers.get(this.numLayers - 1);
+        for (int i = 0; i < this.numOutputs; i++) {
+            outputs[i] = outputLayer.getNeuron(i).getOutput();
+        }
+
+        return outputs;
+    }
+
+    private void backPropagateError(double[] expectedOutput) {
+        for (int i = this.numLayers - 1; i >= 0; i--) {
+            Layer currentLayer = this.layers.get(i);
+            List<Double> errors = new ArrayList<>();
+            if (i != this.numLayers - 1) {
+                for (int j = 0; j < currentLayer.size; j++) {
+                    double error = 0.0;
+                    List<Neuron> prevLayer = this.layers.get(i + 1).getNeurons();
+                    for (Neuron neuron : prevLayer) {
+                        error += neuron.getWeight(j) * neuron.getDelta();
+                    }
+                    errors.add(error);
+                }
+            } else {
+                for (int j = 0; j < currentLayer.size; j++) {
+                    Neuron neuron = currentLayer.getNeuron(j);
+                    errors.add(expectedOutput[j] - neuron.getOutput());
+                }
             }
 
-            this.updateWeights(k);
+            for (int j = 0; j < currentLayer.size; j++) {
+                Neuron neuron = currentLayer.getNeuron(j);
+                neuron.setDelta(errors.get(j) * this.activationFunction.computeDerivative(neuron.getOutput()));
+            }
         }
     }
 
-    private void updateWeights(int index) {
-        for (int i = 0; i < this.layers.get(index + 1).size; i++) {
-            for (int j = 0; j < this.layers.get(index).size; j++) {
-                double delta = this.layers.get(index + 1).neurons[i].delta;
-                double output = this.layers.get(index).neurons[j].output;
-                this.layers.get(index + 1).neurons[i].weights[j] += this.learningRate * delta * output;
+    private void updateWeights() {
+        for (int i = 0; i < this.numLayers - 1; i++) {
+            List<Double> inputs = new ArrayList<>();
+            if (i != 0) {
+                Layer prevLayer = this.layers.get(i - 1);
+                for (int j = 0; j < prevLayer.size; j++) {
+                    inputs.add(prevLayer.getNeuron(j).getOutput());
+                }
+                Layer currentLayer = this.layers.get(i);
+                for (int j = 0; j < currentLayer.size; j++) {
+                    Neuron neuron = currentLayer.getNeuron(j);
+                    for (int k = 0; k < inputs.size(); k++) {
+                        double weightChange = neuron.getWeight(k) + (this.learningRate * neuron.getDelta() * inputs.get(k));
+                        double previousWeightChange = neuron.getPreviousWeightUpdate(k);
+                        double updatedWeight = ((1 - this.alpha) * weightChange) + (this.alpha * previousWeightChange);
+                        neuron.setWeight(k, updatedWeight);
+                        neuron.setPreviousWeightUpdate(k, updatedWeight);
+                    }
+                    neuron.setBias(neuron.getBias() + this.learningRate * neuron.getDelta());
+                }
+            } else {
+                Layer inputLayer = this.layers.get(0);
+                for (int j = 0; j < inputLayer.size; j++) {
+                    inputs.add(inputLayer.getNeuron(j).getOutput());
+                }
             }
-            this.layers.get(index + 1).neurons[i].bias += this.learningRate * this.layers.get(index + 1).neurons[i].delta;
         }
     }
 
-    private Neuron[] getOutputLayer() {
-        return this.layers.get(this.numLayers - 1).neurons;
+    private void resetDeltas() {
+        this.layers.forEach(layer -> layer.getNeurons().forEach(neuron -> neuron.setDelta(0)));
     }
 
     private void initializeLayers(int[] dimensions) {
