@@ -1,6 +1,6 @@
 public class GaussianFunction implements IActivationFunction {
 
-    private double sigma = 0.0; // maxDistance/sqrt(2* number of clusters)
+    private static double sigma = 0.0; // maxDistance/sqrt(2* number of clusters)
     private double mean = 0.0; //RadialBasisNetwork.getMean(); figure this out
 
 
@@ -26,7 +26,7 @@ public class GaussianFunction implements IActivationFunction {
         return this.computeDerivative(value);
     }
 
-    public void setSigma(double sigma) {
-        //maxDistance/sqrt(2* number of clusters)
+    public static void setSigma(double max, int clusters) {
+        sigma = max/Math.sqrt(2 * clusters);
     }
 }
