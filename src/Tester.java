@@ -28,7 +28,6 @@ public class Tester {
             double output = neuralNetwork.approximate(sample.inputs)[0];
             error += Math.abs(output - sample.outputs[0]);
         }
-
         System.out.println("Avg Error: " + error / numSamples);
     }
 
