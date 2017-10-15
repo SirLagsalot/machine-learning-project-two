@@ -1,105 +1,69 @@
 import java.util.List;
+import java.util.Random;
 
 public class RadialBasisNetwork extends NeuralNetwork {
 
     private IActivationFunction activationFunction;
     private int numNeurons;
-    private double[] means; // store a mean for each cluster
+    private Sample[] means; // store a mean for each cluster
     private double learnRate;
     private double[] errors; // average errors from each gradient descent iteration
+    private int batchSize;
+    private int iterations = 1000;
+    private Layer layer;
 
-    public RadialBasisNetwork(int inputs, int outputs, int numNeurons, double learnRate) {
+    public RadialBasisNetwork(int inputs, int outputs, int numNeurons, double learnRate, int batchsize) {
         super(inputs, outputs);
         this.activationFunction = new GaussianFunction();
         this.numNeurons = numNeurons;
         this.learnRate = learnRate;
-        means = new double[numNeurons];
+        this.batchSize = batchsize;
+        means = new Sample[numNeurons];
+
     }
 
     @Override
     public void train(List<Sample> samples) {
-        // randomly split up data into clusters
-        int index = 0;
-        int sub = samples.size()/ numNeurons;
-        for(int i = 0; i < numNeurons; i++){
-            for(int j = 0; j < sub; j++){
-                //cluster[i][j] = samples.get(index);
-                index++;
-            }
+        setMeans(samples);
+        layer = new Layer(numNeurons, 1);
+        for (int i = 0; i < layer.size; i++){
+            layer.getNeuron(i).setOutput(means[i].inputs[0]); //using outputs to store the input to compare with the
         }
 
-        // calculate distances between each point in each cluster
-        // reorganize data until all distances to means are minimized
-        boolean swap = true;
-        double[] tempMeans = new double[cluster.length];
-        double maxDist = 0.0;
-        while (swap == true){
+        double maxDist = distance(layer.getNeuron(0).getOutput(), layer.getNeuron(1).getOutput());
 
-            swap = false;
-            for(int t = 0; t < cluster[t].length; t++) { // this is where i think i might change the data structure to arraylist.
-                tempMeans[t] = calcMean(t);
-
-
-                for (int k = 0; k < cluster.length; k++) {
-                    for (int j = 0; j < cluster[k].length; j++) {
-                        double tempDist = distance(tempMeans[0], cluster[k][j]);
-
-                        for (int i = 1; i < tempMeans.length; i++) {
-                            double temp = distance(tempMeans[i], cluster[k][j]);
-
-                            if (temp < tempDist) {
-                                //cluster[i][] = next open space;
-                                swap = true;
-                            }
-                            if(temp > maxDist){
-                                maxDist = temp;
-                            }
-                        }
-                    }
+        for(int i = 0; i < layer.size; i ++){
+            for(int j = i + 1; j < layer.size; j++){
+                double dist = distance(layer.getNeuron(i).getOutput(), layer.getNeuron(j).getOutput());
+                if(dist > maxDist){
+                    maxDist = dist;
                 }
             }
         }
-        //initialize network with each neuron having a mean to a cluster
-        setMeans();
-        for( int i = 0; i < means.length; i++){
-            //new Neuron()  RBF doesn't use weights; we can initialize the neurons and just ignore the weights?
-        }
+
         GaussianFunction.setSigma(maxDist, numNeurons);
     }
 
     @Override
     public double[] approximate(double[] inputs) {
         double[] outputs = new double[inputs.length];
-
-        for( int i = 0; i < inputs.length; i++){
-            double temp;
-            for( int j = 0; j < means.length; j++){
-                //temp = activationFunction.compute(inputs[i], means[j]);
-
-                //if(temp )
-            }
-        }
-
         return outputs;
-        // for each cluster:
-        // pass the value and the mean of current cluster to the gaussian()
-        // keep track of which cluster has the smallest distance between value and mean
-        //
 
     }
 
-    //get rid of?
-    public double calcMean(int i) {
-        return 0.0;
-    }
 
-    public void setMeans(){ //change to randomly select from samples
-        for(int i = 0; i < numNeurons; i++){
-            means[i] = calcMean(i);
+    public void setMeans(List<Sample> sample){ //change to randomly select from samples
+        Random random = new Random();
+        for(int i = 0; i < numInputs; i++){
+            means[i] = sample.get((int) random.nextDouble() * sample.size());
         }
     }
 
     public double distance(double x, double y){
         return Math.pow(Math.abs(x - y), 2);
+    }
+
+    public void updateWeights(){
+
     }
 }
