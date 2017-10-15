@@ -109,7 +109,7 @@ public class Tester {
         if (type == NetworkType.FeedForwardNetwork) {
            return new FeedForwardNetwork(layers, learningRate, batchSize, momentum, activationFunction, epochs);
         } else {
-            return new RadialBasisNetwork(numInputs, numOutputs, 10, learningRate, batchSize);
+            return new RadialBasisNetwork(numInputs, numOutputs, 10, learningRate, batchSize, epochs);
         }
     }
 
