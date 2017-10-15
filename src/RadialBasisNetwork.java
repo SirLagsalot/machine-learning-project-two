@@ -4,14 +4,13 @@ public class RadialBasisNetwork extends NeuralNetwork {
 
     private IActivationFunction activationFunction;
     private int numNeurons;
-    private double[][] cluster; //change to list/array list?
     private double[] means; // store a mean for each cluster
 
     public RadialBasisNetwork(int inputs, int outputs, int numNeurons) {
         super(inputs, outputs);
         this.activationFunction = new GaussianFunction();
         this.numNeurons = numNeurons;
-        cluster = new double[numNeurons][inputs];
+
         means = new double[numNeurons];
     }
 
@@ -83,23 +82,17 @@ public class RadialBasisNetwork extends NeuralNetwork {
         // for each cluster:
         // pass the value and the mean of current cluster to the gaussian()
         // keep track of which cluster has the smallest distance between value and mean
-        // return the mean closest as the approximation
+        //
 
     }
 
-    //get mean of cluster
+    //get rid of?
     public double calcMean(int i) {
-        double sum = 0.0;
-        for (int j = 0; j < cluster[i].length; j++){
-            sum += cluster[i][j];
-        }
-        return sum/cluster[i].length;
-        //once training is done calculate the mean value for each cluster
-        // and save to the means list
+        return 0.0;
     }
 
-    public void setMeans(){
-        for(int i = 0; i < cluster.length; i++){
+    public void setMeans(){ //change to randomly select from samples
+        for(int i = 0; i < numNeurons; i++){
             means[i] = calcMean(i);
         }
     }
