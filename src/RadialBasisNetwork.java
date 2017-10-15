@@ -55,8 +55,8 @@ public class RadialBasisNetwork extends NeuralNetwork {
             for (Sample sample : samples) {
                 double[] gaussOutputs = gaussian(sample.inputs);
                 networkOutputs[k] = weightedSum(gaussOutputs);
-                if(k == batchSize) {
-                    updateWeights();
+                if(k % batchSize == 0) {
+                    updateWeights(k, sample.inputs);
                 }
                 epochError += this.calculateTotalError(sample.outputs, networkOutputs);
                 k++;
@@ -95,8 +95,12 @@ public class RadialBasisNetwork extends NeuralNetwork {
         return Math.pow(Math.abs(x - y), 2);
     }
 
-    public void updateWeights(){
+    public void updateWeights(int index, double[] inputs){
         //update the weights of each neuron
+
+        for(int i = index; i < i + batchSize && i < layer.size; i++){
+            layer.getNeuron(i).updateWeight(0, learnRate * activationFunction.computeDerivative(distance(inputs[0], means[i].inputs[0])));
+        }
     }
 
     public double calculateTotalError(double[] networkOutputs, double[] expectedOutputs){
