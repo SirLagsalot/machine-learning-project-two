@@ -1,61 +1,64 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Neuron {
 
-    private double output;
-    private double bias;
+    public final int size;
+
+    private List<Double> weights;
+    private double activation;
     private double delta;
-    private double[] weights;
-    private double[] previousWeightUpdates;
+    private double bias;
 
-    public Neuron(int prevLayerSize) {
-        Random random = new Random();
+    private IActivationFunction activationFunction;
 
-        this.weights = new double[prevLayerSize];
-        this.previousWeightUpdates = new double[prevLayerSize];
-        for (int i = 0; i < this.weights.length; i++) {
-            this.weights[i] = random.nextDouble() / 100000000;
+    public Neuron(int connections, IActivationFunction activationFunction) {
+        this.size = connections;
+        this.activationFunction = activationFunction;
+        this.initializeWeights();
+    }
+
+    // Set all weights to a random value between [-0.5, 0.5]
+    private void initializeWeights() {
+        Random random = new Random(System.nanoTime());
+        this.weights = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            this.weights.add(random.nextDouble() - 0.5);
         }
-        this.bias = random.nextDouble() / 10000000;
+        this.bias = random.nextDouble() - 0.5;
+    }
+
+    public double execute(double[] inputs, boolean shouldUseActivationFunction) {
+        double outputSum = bias;
+        for (int i = 0; i < size; i++) {
+            outputSum += inputs[i] * weights.get(i);
+        }
+        this.activation = shouldUseActivationFunction ? this.activationFunction.compute(outputSum) : outputSum;
+        return activation;
     }
 
     public double getWeight(int index) {
-        return this.weights[index];
+        return this.weights.get(index);
     }
 
-    public void setWeight(int index, double weight) {
-        this.weights[index] = weight;
+    public double getOutput() {
+        return this.activation;
     }
 
     public double getDelta() {
-        return delta;
+        return this.delta;
     }
 
     public void setDelta(double delta) {
         this.delta = delta;
     }
 
-    public double getBias() {
-        return bias;
+    public void updateBias(double increment) {
+        this.bias += increment;
     }
 
-    public void setBias(double bias) {
-        this.bias = bias;
-    }
-
-    public double getOutput() {
-        return output;
-    }
-
-    public void setOutput(double output) {
-        this.output = output;
-    }
-
-    public double getPreviousWeightUpdate(int index) {
-        return previousWeightUpdates[index];
-    }
-
-    public void setPreviousWeightUpdate(int index, double previousWeightUpdates) {
-        this.previousWeightUpdates[index] = previousWeightUpdates;
+    public void updateWeight(int index, double increment) {
+        this.weights.set(index, this.weights.get(index) + increment);
     }
 }
