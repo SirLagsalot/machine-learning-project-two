@@ -5,12 +5,14 @@ public class RadialBasisNetwork extends NeuralNetwork {
     private IActivationFunction activationFunction;
     private int numNeurons;
     private double[] means; // store a mean for each cluster
+    private double learnRate;
+    private double[] errors; // average errors from each gradient descent iteration
 
-    public RadialBasisNetwork(int inputs, int outputs, int numNeurons) {
+    public RadialBasisNetwork(int inputs, int outputs, int numNeurons, double learnRate) {
         super(inputs, outputs);
         this.activationFunction = new GaussianFunction();
         this.numNeurons = numNeurons;
-
+        this.learnRate = learnRate;
         means = new double[numNeurons];
     }
 
