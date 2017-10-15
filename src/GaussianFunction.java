@@ -5,15 +5,15 @@ public class GaussianFunction implements IActivationFunction {
 
 
     @Override
-    public double compute(double value) {
+    public double compute(double value) { //value is current - mean
         // 1/(sqrt(2*pi*sigma) * e^(-(current - mean)^2/(2*sigma^2))
-        return 1 / (Math.sqrt(2 * Math.PI * sigma) * Math.exp(-Math.pow((value - mean), 2) / (2 * Math.pow(sigma, 2))));
+        return 1 / (Math.sqrt(2 * Math.PI * sigma) * Math.exp(-Math.pow((value), 2) / (2 * Math.pow(sigma, 2))));
     }
 
     @Override
-    public double computeDerivative(double value) {
+    public double computeDerivative(double value) { //value is current - mean
         //((x - mu)*e^(-((x - mu)^2)/(2*sigma^2)))/(sqrt(2*pi)*sigma^(5/2))
-        return (value - mean) * Math.exp(-(Math.pow((value - mean), 2) / (2 * Math.pow(sigma, 2)))) / (Math.sqrt(2 * Math.PI) * Math.pow(sigma, (5.0 / 2)));
+        return (value) * Math.exp(-(Math.pow((value), 2) / (2 * Math.pow(sigma, 2)))) / (Math.sqrt(2 * Math.PI) * Math.pow(sigma, (5.0 / 2)));
     }
 
     public double compute(double value, double mean) {

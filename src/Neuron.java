@@ -45,6 +45,9 @@ public class Neuron {
     public double getOutput() {
         return this.activation;
     }
+    public void setOutput(double value){
+        this.activation = value;
+    }
 
     public double getDelta() {
         return this.delta;
