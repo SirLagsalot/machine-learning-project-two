@@ -7,7 +7,6 @@ public class RadialBasisNetwork extends NeuralNetwork {
     private int numNeurons;
     private Sample[] means; // store a mean for each cluster
     private double learnRate;
-    private double[] errors; // average errors from each gradient descent iteration
     private int batchSize;
     private int epochs;
     private Layer layer;
@@ -57,8 +56,10 @@ public class RadialBasisNetwork extends NeuralNetwork {
                 double[] gaussOutputs = gaussian(sample.inputs);
                 networkOutputs[k] = weightedSum(gaussOutputs);
                 if(k % batchSize == 0) {
-                    updateWeights(k, sample.inputs);
+
+                    updateWeights(k, sample.outputs, networkOutputs);
                 }
+
                 epochError += this.calculateTotalError(sample.outputs, networkOutputs);
                 k++;
             }
@@ -100,11 +101,22 @@ public class RadialBasisNetwork extends NeuralNetwork {
         return Math.pow(Math.abs(x - y), 2);
     }
 
-    public void updateWeights(int index, double[] inputs){
+    public void updateWeights(int index, double[] inputs, double[] expectedOutputs){
         //update the weights of each neuron
+        assert inputs.length == expectedOutputs.length;
 
-        for(int i = index; i < i + batchSize && i < layer.size; i++){
-            layer.getNeuron(i).updateWeight(0, learnRate * activationFunction.computeDerivative(distance(inputs[0], means[i].inputs[0])));
+        for(int i = 0; i < layer.size ; i++){
+
+            double error = expectedOutputs[i] - inputs[0];
+
+            if(error >= 0) {
+                layer.getNeuron(i).updateWeight(0, learnRate * activationFunction.computeDerivative(distance(inputs[0], means[i].inputs[0])));
+
+            }
+            else {
+                layer.getNeuron(i).updateWeight(0, -(learnRate * activationFunction.computeDerivative(distance(inputs[0], means[i].inputs[0]))));
+
+            }
         }
     }
 
