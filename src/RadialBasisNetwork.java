@@ -90,7 +90,7 @@ public class RadialBasisNetwork extends NeuralNetwork {
         for(int i = 0; i < numNeurons; i++){
             Random random = new Random();
             int temp = (int) (random.nextDouble()* sample.size() / (i + 1));
-            System.out.println("temp index: " + temp);
+            //System.out.println("temp index: " + temp);
             means[i] = sample.get((int) temp );
 
         }
