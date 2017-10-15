@@ -25,7 +25,7 @@ public class RadialBasisNetwork extends NeuralNetwork {
     @Override
     public void train(List<Sample> samples) {
         setMeans(samples);
-        layer = new Layer(numNeurons, 1);
+        layer = new Layer(numNeurons, 1, null);
         for (int i = 0; i < layer.size; i++){
             layer.getNeuron(i).setOutput(means[i].inputs[0]); //using outputs to store the input to compare with the
         }

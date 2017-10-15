@@ -108,10 +108,8 @@ public class Tester {
     private static IFunctionApproximator buildNewNetwork(NetworkType type) {
         if (type == NetworkType.FeedForwardNetwork) {
            return new FeedForwardNetwork(layers, learningRate, batchSize, momentum, activationFunction, epochs);
-        } else if (type == NetworkType.RadialBasisNetwork) {
-            return new RadialBasisNetwork(numInputs, numOutputs, 10);
         } else {
-            return new RadialBasisNetwork(numInputs, numOutputs, 10);
+            return new RadialBasisNetwork(numInputs, numOutputs, 10, learningRate, batchSize);
         }
     }
 
