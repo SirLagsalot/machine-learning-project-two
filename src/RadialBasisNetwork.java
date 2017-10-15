@@ -86,7 +86,7 @@ public class RadialBasisNetwork extends NeuralNetwork {
 
     public void setMeans(List<Sample> sample){ //change to randomly select from samples
         Random random = new Random();
-        for(int i = 0; i < numInputs; i++){
+        for(int i = 0; i < numNeurons; i++){
             means[i] = sample.get((int) random.nextDouble() * sample.size());
         }
     }

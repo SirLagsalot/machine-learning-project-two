@@ -17,7 +17,9 @@ public class Tester {
     private static final int epochs = 5000;
 
     public static void main(String[] args) {
-        IFunctionApproximator neuralNetwork = buildNewNetwork(NetworkType.FeedForwardNetwork);
+        //IFunctionApproximator neuralNetwork = buildNewNetwork(NetworkType.FeedForwardNetwork);
+        IFunctionApproximator neuralNetwork = buildNewNetwork(NetworkType.RadialBasisNetwork);
+
         List<Sample> trainingSamples = SampleGenerator.generateSinSamples(1000);
 
         neuralNetwork.train(trainingSamples);
