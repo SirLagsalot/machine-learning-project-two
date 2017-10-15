@@ -34,6 +34,7 @@ public class RadialBasisNetwork extends NeuralNetwork {
         for (int i = 0; i < layer.size; i++){
             layer.getNeuron(i).setOutput(means[i].inputs[0]); //using outputs to store the input to compare with the
         }
+        System.out.println(layer.getNeuron(0).getOutput() + " " + layer.getNeuron(1).getOutput());
 
         double maxDist = distance(layer.getNeuron(0).getOutput(), layer.getNeuron(1).getOutput());
 
@@ -85,9 +86,13 @@ public class RadialBasisNetwork extends NeuralNetwork {
 
 
     public void setMeans(List<Sample> sample){ //change to randomly select from samples
-        Random random = new Random();
+
         for(int i = 0; i < numNeurons; i++){
-            means[i] = sample.get((int) random.nextDouble() * sample.size());
+            Random random = new Random();
+            int temp = (int) (random.nextDouble()* sample.size() / (i + 1));
+            System.out.println("temp index: " + temp);
+            means[i] = sample.get((int) temp );
+
         }
     }
 

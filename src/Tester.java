@@ -7,8 +7,8 @@ import java.util.stream.IntStream;
 public class Tester {
 
     /* Tunable Parameters */
-    private static final int numInputs = 1;
-    private static final int numOutputs = 1;
+    private static final int numInputs = 10;
+    private static final int numOutputs = 10;
     private static final int[] layers = new int[]{numInputs, 10, numOutputs};    // Size of each layer
     private static final int batchSize = 5;
     private static final double learningRate = 0.05;
