@@ -5,7 +5,7 @@ import java.util.Random;
 public class SampleGenerator {
 
     public static List<Sample> generateSamples(int numInputs) {
-        int numSamples = (int) Math.pow(numInputs, 2) * 5000;
+        int numSamples = (int) Math.pow(numInputs, 3) * 5000;
         int minValue = -3;
         int maxValue = 3;
         double gridWidth = ((double) (maxValue - minValue)) / numSamples * numInputs;
@@ -53,16 +53,15 @@ public class SampleGenerator {
         return sum;
     }
 
-    public static List<Sample> generateQuadraticSamples() {
-        int numSamples = 10000;
+    public static List<Sample> generateQuadraticSamples(int numSamples) {
         ArrayList<Sample> samples = new ArrayList<>(numSamples);
         Random random = new Random();
 
         for (int i = 0; i < numSamples; i++) {
             Sample sample = new Sample(3);
-            int a = random.nextInt(10);
-            int b = random.nextInt(10);
-            int c = random.nextInt(10);
+            double a = random.nextDouble() * 10 - 5;
+            double b = random.nextDouble() * 10 - 5;
+            double c = random.nextDouble() * 10 - 5;
 
             sample.inputs = new double[]{a, b, c};
             sample.outputs = new double[]{(-b + Math.sqrt(Math.abs(Math.pow(b, 2) - 4 * a * c))) / (2 * a)};
@@ -78,10 +77,9 @@ public class SampleGenerator {
         Random random = new Random();
 
         for (int i = 0; i < numSamples; i++) {
-            Sample sample = new Sample(1);
-            sample.inputs = new double[]{(random.nextDouble() * 3) - 3};
-            sample.outputs[0] = Math.sin(sample.inputs[0]);
-            samples.add(sample);
+            double[] input = new double[]{random.nextDouble() * 10 - 5};
+            double[] output = new double[]{Math.sin(input[0])};
+            samples.add(new Sample(input, output));
         }
 
         return samples;

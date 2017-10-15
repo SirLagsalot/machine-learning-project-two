@@ -7,33 +7,25 @@ import java.util.stream.IntStream;
 public class Tester {
 
     /* Tunable Parameters */
-    private static final int numInputs = 2;
+    private static final int numInputs = 1;
     private static final int numOutputs = 1;
-    private static final int[] layers = new int[]{numInputs, 20, 10, 5, numOutputs};    // Size of each layer
+    private static final int[] layers = new int[]{numInputs, 10, numOutputs};    // Size of each layer
     private static final int batchSize = 5;
     private static final double learningRate = 0.05;
     private static final double momentum = 0.5;
-    private static final IActivationFunction activationFunction = new SigmoidFunction();
+    private static final IActivationFunction activationFunction = new HyperbolicFunction();
+    private static final int epochs = 5000;
 
     public static void main(String[] args) {
-        IFunctionApproximator neuralNetwork = new FeedForwardNetwork(layers, learningRate, batchSize, momentum, activationFunction);
-        List<Sample> trainingSamples = SampleGenerator.generateSamples(numInputs);
+        IFunctionApproximator neuralNetwork = buildNewNetwork(NetworkType.FeedForwardNetwork);
+        List<Sample> trainingSamples = SampleGenerator.generateSinSamples(1000);
+
         neuralNetwork.train(trainingSamples);
-
-        List<Sample> testSamples = SampleGenerator.generateSamples(numInputs);
-
-        double error = 0.0;
-        for (Sample sample : testSamples) {
-            double output = neuralNetwork.approximate(sample.inputs)[0];
-            error += Math.abs(output - sample.outputs[0]);
-        }
-
-        System.out.println("Avg Error: " + error / testSamples.size());
     }
 
     // Execute a 5x2 cross validation for both networks computing the mean and standard deviation of their errors
     public static void crossValidate() {
-        List<Sample> dataSet = SampleGenerator.generateSamples(numInputs);
+        List<Sample> dataSet = SampleGenerator.generateQuadraticSamples(numInputs);
 
         IFunctionApproximator FFN;
         IFunctionApproximator RBN;
@@ -46,14 +38,14 @@ public class Tester {
             List<Sample> set1 = dataSet.subList(0, (dataSet.size() / 2));
             List<Sample> set2 = dataSet.subList((dataSet.size() / 2), dataSet.size());
 
-            FFN = new FeedForwardNetwork(layers, learningRate, batchSize, momentum, activationFunction);
-            RBN = new RadialBasisNetwork(numInputs, numOutputs, 10);
+            FFN = buildNewNetwork(NetworkType.FeedForwardNetwork);
+            RBN = buildNewNetwork(NetworkType.RadialBasisNetwork);
 
             ffnErrors.addAll(computeFold(set1, set2, FFN));
             rbfErrors.addAll(computeFold(set1, set2, RBN));
 
-            FFN = new FeedForwardNetwork(layers, learningRate, batchSize, momentum, activationFunction);
-            RBN = new RadialBasisNetwork(numInputs, numOutputs, 10);
+            FFN = buildNewNetwork(NetworkType.FeedForwardNetwork);
+            RBN = buildNewNetwork(NetworkType.RadialBasisNetwork);
 
             ffnErrors.addAll(computeFold(set2, set1, FFN));
             rbfErrors.addAll(computeFold(set2, set1, RBN));
@@ -111,6 +103,21 @@ public class Tester {
         System.out.println("-------------------------------");
         System.out.println("Mean error:         " + mean);
         System.out.println("Standard Deviation: " + standardDeviation);
+    }
+
+    private static IFunctionApproximator buildNewNetwork(NetworkType type) {
+        if (type == NetworkType.FeedForwardNetwork) {
+           return new FeedForwardNetwork(layers, learningRate, batchSize, momentum, activationFunction, epochs);
+        } else if (type == NetworkType.RadialBasisNetwork) {
+            return new RadialBasisNetwork(numInputs, numOutputs, 10);
+        } else {
+            return new RadialBasisNetwork(numInputs, numOutputs, 10);
+        }
+    }
+
+    enum NetworkType {
+        FeedForwardNetwork,
+        RadialBasisNetwork
     }
 }
 
