@@ -1,52 +1,46 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 public class RadialBasisNetwork extends NeuralNetwork {
 
-    private IActivationFunction activationFunction;
-    private int numNeurons;
-    private Sample[] means; // store a mean for each cluster
     private double learnRate;
     private int batchSize;
     private int epochs;
-    private Layer layer;
+    private List<Neuron> hiddenLayer;
+    private IActivationFunction activationFunction;
 
-    public RadialBasisNetwork(int inputs, int outputs, int numNeurons, double learnRate, int batchsize, int epochs) {
+    private final int size;
+
+    public RadialBasisNetwork(int inputs, int outputs, int size, double learnRate, int batchSize, int epochs) {
         super(inputs, outputs);
         this.activationFunction = new GaussianFunction();
-        this.numNeurons = numNeurons;
+        this.size = size;
         this.learnRate = learnRate;
-        this.batchSize = batchsize;
+        this.batchSize = batchSize;
         this.epochs = epochs;
-        means = new Sample[numNeurons];
-
+        this.hiddenLayer = new ArrayList<>(size);
     }
 
     @Override
     public void train(List<Sample> samples) {
-        setMeans(samples);
+        this.initializeMeans(samples);
 
-        layer = new Layer(numNeurons, 1, activationFunction);
+        System.out.println(this.hiddenLayer.get(0).getOutput() + " " + this.hiddenLayer.get(1).getOutput());
 
-        layer = new Layer(numNeurons, 1, null);
+        double maxDist = distance(this.hiddenLayer.get(0).getOutput(), this.hiddenLayer.get(1).getOutput());
 
-        for (int i = 0; i < layer.size; i++){
-            layer.getNeuron(i).setOutput(means[i].inputs[0]); //using outputs to store the input to compare with the
-        }
-        System.out.println(layer.getNeuron(0).getOutput() + " " + layer.getNeuron(1).getOutput());
-
-        double maxDist = distance(layer.getNeuron(0).getOutput(), layer.getNeuron(1).getOutput());
-
-        for(int i = 0; i < layer.size; i ++){
-            for(int j = i + 1; j < layer.size; j++){
-                double dist = distance(layer.getNeuron(i).getOutput(), layer.getNeuron(j).getOutput());
-                if(dist > maxDist){
+        for (int i = 0; i < size; i++) {
+            for (int j = i + 1; j < size; j++) {
+                double dist = distance(this.hiddenLayer.get(i).getOutput(), this.hiddenLayer.get(j).getOutput());
+                if (dist > maxDist) {
                     maxDist = dist;
                 }
             }
         }
 
-        GaussianFunction.setSigma(maxDist, numNeurons);
+        GaussianFunction.setSigma(maxDist, size);
 
         for (int i = 0; i < epochs; i++) {
             double epochError = 0.0;
@@ -54,8 +48,8 @@ public class RadialBasisNetwork extends NeuralNetwork {
             int k = 0;
             for (Sample sample : samples) {
                 double[] gaussOutputs = gaussian(sample.inputs);
-                networkOutputs[k] = weightedSum(gaussOutputs);
-                if(k % batchSize == 0) {
+                networkOutputs[k] = sumOutputs(gaussOutputs);
+                if (k % batchSize == 0) {
 
                     updateWeights(k, sample.outputs, networkOutputs);
                 }
@@ -69,85 +63,54 @@ public class RadialBasisNetwork extends NeuralNetwork {
 
     @Override
     public double[] approximate(double[] inputs) {
-        double[] outputs = new double[inputs.length];
-        outputs = gaussian(inputs);
-
+        double[] outputs = gaussian(inputs);
         double[] approx = new double[inputs.length];
 
-        for(int i = 0; i < inputs.length; i++){
-            approx[i] = weightedSum(outputs);
+        for (int i = 0; i < inputs.length; i++) {
+            approx[i] = sumOutputs(outputs);
         }
 
         return approx;
-        // pass input thru the gaussians
-        //weighted sum as output
-
-
     }
 
 
-    public void setMeans(List<Sample> sample){ //change to randomly select from samples
-
-        for(int i = 0; i < numNeurons; i++){
-            Random random = new Random();
-            int temp = (int) (random.nextDouble()* sample.size() / (i + 1));
-            //System.out.println("temp index: " + temp);
-            means[i] = sample.get((int) temp );
-
+    public void initializeMeans(List<Sample> samples) {
+        Random random = new Random(System.nanoTime());
+        for (int i = 0; i < this.size; i++) {
+            int initIndex = random.nextInt(samples.size());
+            Sample targetSample = samples.get(initIndex);
+            this.hiddenLayer.add(new Neuron(this.numInputs, targetSample.inputs, targetSample.outputs));
         }
     }
 
-    public double distance(double x, double y){
+    public double distance(double x, double y) {
         return Math.pow(Math.abs(x - y), 2);
     }
 
-    public void updateWeights(int index, double[] inputs, double[] expectedOutputs){
+    public void updateWeights(int index, double[] inputs, double[] expectedOutputs) {
         //update the weights of each neuron
         assert inputs.length == expectedOutputs.length;
 
-        for(int i = 0; i < layer.size ; i++){
-
+        for (int i = 0; i < this.hiddenLayer.size(); i++) {
             double error = expectedOutputs[i] - inputs[0];
-
-            if(error >= 0) {
-                layer.getNeuron(i).updateWeight(0, learnRate * activationFunction.computeDerivative(distance(inputs[0], means[i].inputs[0])));
-
-            }
-            else {
-                layer.getNeuron(i).updateWeight(0, -(learnRate * activationFunction.computeDerivative(distance(inputs[0], means[i].inputs[0]))));
-
+            Neuron currentNeuron = this.hiddenLayer.get(i);
+            if (error >= 0) {
+                currentNeuron.updateWeight(0, this.learnRate * this.activationFunction.computeDerivative(distance(inputs[0], currentNeuron.getInput(0))));
+            } else {
+                currentNeuron.updateWeight(0, -(this.learnRate * this.activationFunction.computeDerivative(distance(inputs[0], currentNeuron.getInput(0)))));
             }
         }
     }
 
-    public double calculateTotalError(double[] networkOutputs, double[] expectedOutputs){
-        assert networkOutputs.length == expectedOutputs.length;
-
-        double errorSum = 0.0;
-        // Calculate the sum over the squared error for each output value
-        for (int i = 0; i < networkOutputs.length; i++) {
-            double error = networkOutputs[i] - expectedOutputs[i];
-            errorSum += Math.pow(error, 2);
-        }
-
-        // Normalize and return error
-        return errorSum / (networkOutputs.length * expectedOutputs.length);
-    }
-
-    public double[] gaussian(double[] inputs){
-
-        double[] gauss = new double[layer.size];
-        for( int i = 0; i < layer.size; i++){
-            gauss[i] = layer.getNeuron(i).getWeight(0) * activationFunction.compute(distance(inputs[0], means[i].inputs[0]));
+    private double[] gaussian(double[] inputs) {
+        double[] gauss = new double[hiddenLayer.size()];
+        for (int i = 0; i < this.hiddenLayer.size(); i++) {
+            gauss[i] = this.hiddenLayer.get(i).getWeight(0) * this.activationFunction.compute(distance(inputs[0], this.hiddenLayer.get(i).getMean()));
         }
         return gauss;
     }
 
-    public double weightedSum(double[] gaussOutput){
-        double weighted = 0.0;
-        for(int i = 0; i < gaussOutput.length; i++){
-            weighted += gaussOutput[i];
-        }
-        return weighted;
+    private double sumOutputs(double[] gaussOutput) {
+        return Arrays.stream(gaussOutput).sum();
     }
 }

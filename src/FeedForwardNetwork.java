@@ -22,10 +22,6 @@ public class FeedForwardNetwork extends NeuralNetwork {
         this.initializeNetwork(networkDimensions);
     }
 
-    public void printDeltas() {
-        this.network.forEach(layer -> layer.getNeurons().forEach(neuron -> System.out.println(neuron.getDelta())));
-    }
-
     @Override
     public void train(List<Sample> samples) {
 
@@ -114,20 +110,6 @@ public class FeedForwardNetwork extends NeuralNetwork {
 
     private void resetWeightDeltas() {
         this.network.forEach(layer -> layer.getNeurons().forEach(neuron -> neuron.setDelta(0.0)));
-    }
-
-    private double calculateTotalError(double[] networkOutputs, double[] expectedOutputs) {
-        assert networkOutputs.length == expectedOutputs.length;
-
-        double errorSum = 0.0;
-        // Calculate the sum over the squared error for each output value
-        for (int i = 0; i < networkOutputs.length; i++) {
-            double error = networkOutputs[i] - expectedOutputs[i];
-            errorSum += Math.pow(error, 2);
-        }
-
-        // Normalize and return error
-        return errorSum / (networkOutputs.length * expectedOutputs.length);
     }
 
     // Initialize each layer of the network, in the input layer is created implicitly in execution and does not have a layer

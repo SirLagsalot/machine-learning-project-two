@@ -11,12 +11,25 @@ public class Neuron {
     private double delta;
     private double bias;
 
+    private double inputs[];
+    private double outputs[];
+    private double mean;
+
     private IActivationFunction activationFunction;
 
+    // Feed-forward network constructor
     public Neuron(int connections, IActivationFunction activationFunction) {
         this.size = connections;
         this.activationFunction = activationFunction;
         this.initializeWeights();
+    }
+
+    // Radial basis network constructor
+    public Neuron(int connections, double[] inputs, double[] outputs) {
+        this.size = connections;
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.mean = 0.0;
     }
 
     // Set all weights to a random value between [-0.5, 0.5]
@@ -45,9 +58,6 @@ public class Neuron {
     public double getOutput() {
         return this.activation;
     }
-    public void setOutput(double value){
-        this.activation = value;
-    }
 
     public double getDelta() {
         return this.delta;
@@ -63,5 +73,33 @@ public class Neuron {
 
     public void updateWeight(int index, double increment) {
         this.weights.set(index, this.weights.get(index) - increment);
+    }
+
+    public double getMean() {
+        return mean;
+    }
+
+    public void setMean(double mean) {
+        this.mean = mean;
+    }
+
+    public double[] getInputs() {
+        return inputs;
+    }
+
+    public double getInput(int index) {
+        return this.inputs[index];
+    }
+
+    public void setInputs(double[] inputs) {
+        this.inputs = inputs;
+    }
+
+    public double[] getOutputs() {
+        return outputs;
+    }
+
+    public void setOutputs(double[] outputs) {
+        this.outputs = outputs;
     }
 }
