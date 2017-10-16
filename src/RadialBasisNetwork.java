@@ -42,12 +42,11 @@ public class RadialBasisNetwork extends NeuralNetwork {
 
         for (int i = 0; i < epochs; i++) {
             double epochError = 0.0;
-            double[] networkOutputs = new double[samples.size()];
             for (int j = 0; j < samples.size(); j++) {
                 Sample sample = samples.get(j);
-                networkOutputs[j] = sumOutputs(this.computeGaussianActivation(sample.inputs));
+                double[] networkOutputs = this.computeGaussianActivation(sample.inputs);
                 if (j % batchSize == 0) {
-                    updateWeights(sample.outputs, networkOutputs);
+                    updateWeights(networkOutputs, sample.outputs);
                 }
 
                 epochError += this.calculateTotalError(sample.outputs, networkOutputs);
@@ -58,7 +57,7 @@ public class RadialBasisNetwork extends NeuralNetwork {
 
     @Override
     public double[] approximate(double[] inputs) {
-        double[] outputs = computeGaussianActivation(inputs);
+        double[] outputs = this.computeGaussianActivation(inputs);
         double[] approx = new double[inputs.length];
 
         for (int i = 0; i < inputs.length; i++) {
@@ -126,7 +125,7 @@ public class RadialBasisNetwork extends NeuralNetwork {
             double output = 0.0;
             // Sum over connections
             for (int j = 0; j < outputNeuron.size; j++) {
-                output += outputNeuron.getWeight(j) * this.activationFunction.compute(this.computeDistance(inputs, this.hiddenLayer.get(j).getInputs()));
+                output += outputNeuron.getWeight(j) * this.computeDistance(inputs, this.hiddenLayer.get(j).getInputs());
             }
             outputs[i] = output;
         }
