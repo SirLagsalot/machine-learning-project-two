@@ -7,6 +7,7 @@ public class Neuron {
     public final int size;
 
     private List<Double> weights;
+    private List<Double> previousWeights;
     private double activation;
     private double delta;
     private double bias;
@@ -17,7 +18,7 @@ public class Neuron {
 
     private IActivationFunction activationFunction;
 
-    // Feed-forward network constructor
+    // Feed forward network constructor
     public Neuron(int connections, IActivationFunction activationFunction) {
         this.size = connections;
         this.activationFunction = activationFunction;
@@ -30,7 +31,7 @@ public class Neuron {
         this.initializeWeights(randomizeWeights);
     }
 
-    // Set all weights to a random value between [-0.5, 0.5]
+    // Set up connection weights, set to random value between [-0.5, 0.5] or all 1 depending on flag
     private void initializeWeights(boolean randomizeWeights) {
         Random random = new Random(System.nanoTime());
         this.weights = new ArrayList<>(size);
@@ -45,8 +46,11 @@ public class Neuron {
             }
             this.bias = 1.0;
         }
+        this.previousWeights = new ArrayList<>(size);
+        this.previousWeights.addAll(this.weights);
     }
 
+    // Calculate the activation of the neuron given a set of inputs, apply activation function if flag is set
     public double execute(double[] inputs, boolean shouldUseActivationFunction) {
         double outputSum = bias;
         for (int i = 0; i < size; i++) {
@@ -76,8 +80,15 @@ public class Neuron {
         this.bias += increment;
     }
 
+    // Set the previous weight as the current weight and increment the current weight by the suppied value
     public void updateWeight(int index, double increment) {
-        this.weights.set(index, this.weights.get(index) - increment);
+        double previousWeight = this.weights.get(index);
+        this.previousWeights.set(index, previousWeight);
+        this.weights.set(index, previousWeight + increment);
+    }
+
+    public double getPreviousWeight(int index) {
+        return this.previousWeights.get(index);
     }
 
     public double[] getMean() {

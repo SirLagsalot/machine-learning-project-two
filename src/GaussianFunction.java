@@ -1,32 +1,23 @@
 public class GaussianFunction implements IActivationFunction {
 
-    private static double sigma = 0.0; // maxDistance/sqrt(2* number of clusters)
-    private double mean = 0.0; //RadialBasisNetwork.getMean(); figure this out
+    private static double SIGMA = 0.0;
+    private double mean = 0.0;
 
 
     @Override
-    public double compute(double value) { //value is current - mean
-        // 1/(sqrt(2*pi*sigma) * e^(-(current - mean)^2/(2*sigma^2))
-        return 1 / (Math.sqrt(2 * Math.PI * sigma) * Math.exp(-Math.pow((value), 2) / (2 * Math.pow(sigma, 2))));
+    public double compute(double value) {
+        // Value should be the distance between the mean and the inputs for a given neuron
+        return 1 / (Math.sqrt(2 * Math.PI * SIGMA) * Math.exp(-Math.pow((value), 2) / (2 * Math.pow(SIGMA, 2))));
     }
 
     @Override
-    public double computeDerivative(double value) { //value is current - mean
-        //((x - mu)*e^(-((x - mu)^2)/(2*sigma^2)))/(sqrt(2*pi)*sigma^(5/2))
-        return (value) * Math.exp(-(Math.pow((value), 2) / (2 * Math.pow(sigma, 2)))) / (Math.sqrt(2 * Math.PI) * Math.pow(sigma, (5.0 / 2)));
+    public double computeDerivative(double value) {
+        // Value should be the distance between the mean and the inputs for a given neuron
+        return (value) * Math.exp(-(Math.pow((value), 2) / (2 * Math.pow(SIGMA, 2)))) / (Math.sqrt(2 * Math.PI) * Math.pow(SIGMA, (5.0 / 2)));
     }
 
-    public double compute(double value, double mean) {
-        this.mean = mean;
-        return this.compute(value);
-    }
-
-    public double computeDerivative(double value, double mean) {
-        this.mean = mean;
-        return this.computeDerivative(value);
-    }
-
+    // Sigma is a tunable parameter set using the following heuristic
     public static void setSigma(double max, int clusters) {
-        GaussianFunction.sigma = max / Math.sqrt(2 * clusters);
+        GaussianFunction.SIGMA = max / Math.sqrt(2 * clusters);
     }
 }

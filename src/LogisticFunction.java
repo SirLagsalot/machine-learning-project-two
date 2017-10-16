@@ -1,4 +1,4 @@
-public class SigmoidFunction implements IActivationFunction {
+public class LogisticFunction implements IActivationFunction {
 
     @Override
     public double compute(double value) {

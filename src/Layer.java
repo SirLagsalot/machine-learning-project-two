@@ -13,6 +13,7 @@ public class Layer {
         this.initializeNeurons(connections, activationFunction);
     }
 
+    // Add the specified number of neurons to the layer
     private void initializeNeurons(int connections, IActivationFunction activationFunction) {
         this.neurons = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
@@ -20,6 +21,7 @@ public class Layer {
         }
     }
 
+    // Pass inputs to each of the neurons in the layer
     public double[] execute(double[] inputs, boolean shouldUseActivation) {
         double[] outputs = new double[size];
 
