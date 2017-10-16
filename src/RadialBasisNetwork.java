@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
+/**
+ * Radial basis neural network
+ * Initialized with the number of inputs and outputs the network will be working with
+ * along with a learning rate, batch update size, and the number of epochs the network will iterate over while learning
+ */
 public class RadialBasisNetwork extends NeuralNetwork {
 
     private double learnRate;
@@ -81,7 +86,7 @@ public class RadialBasisNetwork extends NeuralNetwork {
     }
 
 
-    public void initializeMeans(List<Sample> samples) {
+    private void initializeMeans(List<Sample> samples) {
         Random random = new Random(System.nanoTime());
         for (int i = 0; i < this.size; i++) {
             int initIndex = random.nextInt(samples.size());
@@ -91,7 +96,7 @@ public class RadialBasisNetwork extends NeuralNetwork {
     }
 
     // Compute the euclidean distance between the to arrays
-    public double computeDistance(double[] x, double[] y) {
+    private double computeDistance(double[] x, double[] y) {
         assert x.length == y.length;
 
         double sum = IntStream
@@ -102,7 +107,7 @@ public class RadialBasisNetwork extends NeuralNetwork {
         return Math.sqrt(sum);
     }
 
-    public void updateWeights(double[] networkOutputs, double[] expectedOutputs) {
+    private void updateWeights(double[] networkOutputs, double[] expectedOutputs) {
         //update the weights of each neuron
         assert networkOutputs.length == expectedOutputs.length;
 

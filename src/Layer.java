@@ -2,7 +2,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-
+/**
+ * Layer object represents a single layer in a neuronal net, consisting of an array of individual neurons and
+ * an execute function which handles propagation through the particular layer
+ */
 public class Layer {
 
     public final int size;

@@ -1,5 +1,9 @@
 import java.util.List;
 
+/**
+ * NeuralNetwork is a base class for networks implemented in this project, holds common attributes and functions
+ * as well as enforcement of the IFunctionApproximator interface
+ */
 public abstract class NeuralNetwork implements IFunctionApproximator {
 
     protected IActivationFunction activationFunction;
@@ -28,6 +32,7 @@ public abstract class NeuralNetwork implements IFunctionApproximator {
         return error;
     }
 
+    // Compute the normalized squared error between a set of outputs and their true values
     protected double calculateTotalError(double[] networkOutputs, double[] expectedOutputs) {
         assert networkOutputs.length == expectedOutputs.length;
 

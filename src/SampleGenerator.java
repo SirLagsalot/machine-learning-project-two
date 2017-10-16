@@ -2,8 +2,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Utility class for generating sample data from different functions
+ * Primary purpose in to provide sample training and test data for the Rosenbrock function
+ * Additionally provides samples for similar functions such as sine and quadratic
+ */
 public class SampleGenerator {
 
+    // Generate a list of samples based on the number of inputs to the rosenbrock
+    // Number of samples generated is a function of the input dimensions
     public static List<Sample> generateSamples(int numInputs) {
         int numSamples = (int) Math.pow(numInputs, 3) * 5000;
         int minValue = -3;
@@ -31,6 +38,7 @@ public class SampleGenerator {
         return samples;
     }
 
+    // Generate rosenbrock samples using more specific parameters
     public static List<Sample> generateSamples(int numSamples, int numInputs, int maxInputVal, int numOutputs) {
         ArrayList<Sample> samples = new ArrayList<>(numSamples);
 
@@ -43,6 +51,7 @@ public class SampleGenerator {
         return samples;
     }
 
+    // Compute the output of the Rosenbrock function given its inputs
     public static double computeRosenbrockOutput(double[] inputs) {
         double sum = 0;
 
@@ -53,6 +62,7 @@ public class SampleGenerator {
         return sum;
     }
 
+    // Generate samples for a variation of the quadratic formula for leaning purposes
     public static List<Sample> generateQuadraticSamples(int numSamples) {
         ArrayList<Sample> samples = new ArrayList<>(numSamples);
         Random random = new Random();

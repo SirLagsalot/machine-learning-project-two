@@ -4,6 +4,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
+/**
+ * Tester class provides a means to initialize and train neural networks
+ * Additionally a five by two cross fold validation function is provided to test and compare networks
+ */
 public class Tester {
 
     /* Tunable Parameters */
@@ -14,7 +18,7 @@ public class Tester {
     private static final int batchSize = 10;
     private static final double learningRate = 0.3;
     private static final double momentum = 0.5;
-    private static final IActivationFunction activationFunction = new HyperbolicFunction();
+    private static final IActivationFunction activationFunction = new HyperbolicTanFunction();
     private static final int epochs = 5000;
 
     public static void main(String[] args) {
@@ -108,15 +112,16 @@ public class Tester {
         System.out.println("Standard Deviation: " + standardDeviation);
     }
 
+    // Construct a new network of the requested type
     private static IFunctionApproximator buildNewNetwork(NetworkType type) {
         if (type == NetworkType.FeedForwardNetwork) {
-           return new FeedForwardNetwork(layers, learningRate, batchSize, momentum, activationFunction, epochs);
+            return new FeedForwardNetwork(layers, learningRate, batchSize, momentum, activationFunction, epochs);
         } else {
-            return new RadialBasisNetwork(numInputs, numOutputs, numBasisNeurons,learningRate, batchSize, epochs);
+            return new RadialBasisNetwork(numInputs, numOutputs, numBasisNeurons, learningRate, batchSize, epochs);
         }
     }
 
-    enum NetworkType {
+    protected enum NetworkType {
         FeedForwardNetwork,
         RadialBasisNetwork
     }

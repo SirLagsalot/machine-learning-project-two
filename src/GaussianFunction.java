@@ -1,8 +1,6 @@
 public class GaussianFunction implements IActivationFunction {
 
     private static double SIGMA = 0.0;
-    private double mean = 0.0;
-
 
     @Override
     public double compute(double value) {
