@@ -7,8 +7,9 @@ import java.util.stream.IntStream;
 public class Tester {
 
     /* Tunable Parameters */
-    private static final int numInputs = 1000;
-    private static final int numOutputs = 1000;
+    private static final int numInputs = 1;
+    private static final int numOutputs = 1;
+    private static final int numBasisNeurons = 1000;
     private static final int[] layers = new int[]{numInputs, 10, numOutputs};    // Size of each layer
     private static final int batchSize = 10;
     private static final double learningRate = 0.3;
@@ -111,7 +112,7 @@ public class Tester {
         if (type == NetworkType.FeedForwardNetwork) {
            return new FeedForwardNetwork(layers, learningRate, batchSize, momentum, activationFunction, epochs);
         } else {
-            return new RadialBasisNetwork(numInputs, numOutputs, 5,learningRate, batchSize, epochs);
+            return new RadialBasisNetwork(numInputs, numOutputs, numBasisNeurons,learningRate, batchSize, epochs);
         }
     }
 

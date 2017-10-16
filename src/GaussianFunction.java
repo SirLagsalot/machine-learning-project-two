@@ -27,6 +27,6 @@ public class GaussianFunction implements IActivationFunction {
     }
 
     public static void setSigma(double max, int clusters) {
-        sigma = max/Math.sqrt(2 * clusters);
+        GaussianFunction.sigma = max / Math.sqrt(2 * clusters);
     }
 }

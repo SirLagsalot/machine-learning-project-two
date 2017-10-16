@@ -21,22 +21,30 @@ public class Neuron {
     public Neuron(int connections, IActivationFunction activationFunction) {
         this.size = connections;
         this.activationFunction = activationFunction;
-        this.initializeWeights();
+        this.initializeWeights(true);
     }
 
     // Radial basis network constructor
-    public Neuron(int connections) {
+    public Neuron(int connections, boolean randomizeWeights) {
         this.size = connections;
+        this.initializeWeights(randomizeWeights);
     }
 
     // Set all weights to a random value between [-0.5, 0.5]
-    private void initializeWeights() {
+    private void initializeWeights(boolean randomizeWeights) {
         Random random = new Random(System.nanoTime());
         this.weights = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            this.weights.add(random.nextDouble() - 0.5);
+        if (randomizeWeights) {
+            for (int i = 0; i < size; i++) {
+                this.weights.add(random.nextDouble() - 0.5);
+            }
+            this.bias = random.nextDouble() - 0.5;
+        } else {
+            for (int i = 0; i < size; i++) {
+                this.weights.add(1.0);
+            }
+            this.bias = 1.0;
         }
-        this.bias = random.nextDouble() - 0.5;
     }
 
     public double execute(double[] inputs, boolean shouldUseActivationFunction) {

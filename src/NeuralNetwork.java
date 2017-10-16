@@ -21,7 +21,7 @@ public abstract class NeuralNetwork implements IFunctionApproximator {
         assert networkOutputs.length == expectedOutputs.length;
 
         double[] error = new double[networkOutputs.length];
-        for (int i = 0; i < networkOutputs.length; i++) {
+        for (int i = 0; i < networkOutputs.length - 1; i++) {
             error[i] = (networkOutputs[i] - expectedOutputs[i]) * this.activationFunction.computeDerivative(networkOutputs[i]);
         }
 
