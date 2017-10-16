@@ -16,11 +16,15 @@ public abstract class NeuralNetwork implements IFunctionApproximator {
 
     public abstract double[] approximate(double[] inputs);
 
+    // Compute the slope of the error in the output with respect to each node in the output layer
     protected double[] computeOutputErrorGradient(double[] networkOutputs, double[] expectedOutputs) {
+        assert networkOutputs.length == expectedOutputs.length;
+
         double[] error = new double[networkOutputs.length];
         for (int i = 0; i < networkOutputs.length; i++) {
             error[i] = (networkOutputs[i] - expectedOutputs[i]) * this.activationFunction.computeDerivative(networkOutputs[i]);
         }
+
         return error;
     }
 

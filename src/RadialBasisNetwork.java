@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 public class RadialBasisNetwork extends NeuralNetwork {
 
@@ -9,31 +10,29 @@ public class RadialBasisNetwork extends NeuralNetwork {
     private int batchSize;
     private int epochs;
     private List<Neuron> hiddenLayer;
+    private List<Neuron> outputLayer;
     private IActivationFunction activationFunction;
 
     private final int size;
 
-    public RadialBasisNetwork(int inputs, int outputs, int size, double learnRate, int batchSize, int epochs) {
+    public RadialBasisNetwork(int inputs, int outputs, int hiddenNodes, double learnRate, int batchSize, int epochs) {
         super(inputs, outputs);
         this.activationFunction = new GaussianFunction();
-        this.size = size;
+        this.size = hiddenNodes;
         this.learnRate = learnRate;
         this.batchSize = batchSize;
         this.epochs = epochs;
-        this.hiddenLayer = new ArrayList<>(size);
+        this.initializeNetwork();
     }
 
     @Override
     public void train(List<Sample> samples) {
         this.initializeMeans(samples);
 
-        System.out.println(this.hiddenLayer.get(0).getOutput() + " " + this.hiddenLayer.get(1).getOutput());
-
-        double maxDist = distance(this.hiddenLayer.get(0).getOutput(), this.hiddenLayer.get(1).getOutput());
-
-        for (int i = 0; i < size; i++) {
-            for (int j = i + 1; j < size; j++) {
-                double dist = distance(this.hiddenLayer.get(i).getOutput(), this.hiddenLayer.get(j).getOutput());
+        double maxDist = 0.0;
+        for (int i = 0; i < this.size; i++) {
+            for (int j = i + 1; j < this.size; j++) {
+                double dist = this.computeDistance(this.hiddenLayer.get(i).getInputs(), this.hiddenLayer.get(j).getInputs());
                 if (dist > maxDist) {
                     maxDist = dist;
                 }
@@ -73,31 +72,50 @@ public class RadialBasisNetwork extends NeuralNetwork {
         return approx;
     }
 
+    private void initializeNetwork() {
+        // Set up hidden layer
+        this.hiddenLayer = new ArrayList<>(this.size);
+        for (int i = 0; i < size; i++) {
+            this.hiddenLayer.add(new Neuron(this.numInputs));
+        }
+        // Set up output layer
+        this.outputLayer = new ArrayList<>(this.numOutputs);
+        for (int i = 0; i < this.numOutputs; i++) {
+            this.outputLayer.add(new Neuron(this.size));
+        }
+    }
+
 
     public void initializeMeans(List<Sample> samples) {
         Random random = new Random(System.nanoTime());
         for (int i = 0; i < this.size; i++) {
             int initIndex = random.nextInt(samples.size());
             Sample targetSample = samples.get(initIndex);
-            this.hiddenLayer.add(new Neuron(this.numInputs, targetSample.inputs, targetSample.outputs));
+            this.hiddenLayer.get(i).setMean(targetSample.inputs);
         }
     }
 
-    public double distance(double x, double y) {
-        return Math.pow(Math.abs(x - y), 2);
+    // Compute the euclidean distance between the to arrays
+    public double computeDistance(double[] x, double[] y) {
+        assert x.length == y.length;
+
+        double sum = IntStream
+                .range(0, x.length)
+                .mapToDouble(i -> Math.pow(x[i] - y[i], 2))
+                .sum();
+
+        return Math.sqrt(sum);
     }
 
-    public void updateWeights(int index, double[] inputs, double[] expectedOutputs) {
+    public void updateWeights(int index, double[] networkOutputs, double[] expectedOutputs) {
         //update the weights of each neuron
-        assert inputs.length == expectedOutputs.length;
+        assert networkOutputs.length == expectedOutputs.length;
 
-        for (int i = 0; i < this.hiddenLayer.size(); i++) {
-            double error = expectedOutputs[i] - inputs[0];
-            Neuron currentNeuron = this.hiddenLayer.get(i);
-            if (error >= 0) {
-                currentNeuron.updateWeight(0, this.learnRate * this.activationFunction.computeDerivative(distance(inputs[0], currentNeuron.getInput(0))));
-            } else {
-                currentNeuron.updateWeight(0, -(this.learnRate * this.activationFunction.computeDerivative(distance(inputs[0], currentNeuron.getInput(0)))));
+        double[] partialErrors = this.computeOutputErrorGradient(networkOutputs, expectedOutputs);
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.outputLayer.size(); j++) {
+                Neuron outputNeuron = this.outputLayer.get(i);
+                outputNeuron.updateWeight(i, partialErrors[j] * this.learnRate);
             }
         }
     }
@@ -105,7 +123,7 @@ public class RadialBasisNetwork extends NeuralNetwork {
     private double[] gaussian(double[] inputs) {
         double[] gauss = new double[hiddenLayer.size()];
         for (int i = 0; i < this.hiddenLayer.size(); i++) {
-            gauss[i] = this.hiddenLayer.get(i).getWeight(0) * this.activationFunction.compute(distance(inputs[0], this.hiddenLayer.get(i).getMean()));
+            gauss[i] = this.hiddenLayer.get(i).getWeight(0) * this.activationFunction.compute(computeDistance(inputs, this.hiddenLayer.get(i).getMean()));
         }
         return gauss;
     }

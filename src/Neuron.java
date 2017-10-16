@@ -11,9 +11,9 @@ public class Neuron {
     private double delta;
     private double bias;
 
-    private double inputs[];
-    private double outputs[];
-    private double mean;
+    private double[] inputs;
+    private double[] outputs;
+    private double[] mean;
 
     private IActivationFunction activationFunction;
 
@@ -25,11 +25,8 @@ public class Neuron {
     }
 
     // Radial basis network constructor
-    public Neuron(int connections, double[] inputs, double[] outputs) {
+    public Neuron(int connections) {
         this.size = connections;
-        this.inputs = inputs;
-        this.outputs = outputs;
-        this.mean = 0.0;
     }
 
     // Set all weights to a random value between [-0.5, 0.5]
@@ -75,11 +72,11 @@ public class Neuron {
         this.weights.set(index, this.weights.get(index) - increment);
     }
 
-    public double getMean() {
+    public double[] getMean() {
         return mean;
     }
 
-    public void setMean(double mean) {
+    public void setMean(double[] mean) {
         this.mean = mean;
     }
 
